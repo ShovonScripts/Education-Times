@@ -7,16 +7,16 @@
         </div>
         <a href="{{ route('admin.articles.create') }}" class="bg-[#E02020] text-white px-5 py-2 text-sm font-medium hover:bg-red-700 transition flex items-center gap-1.5">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            নতুন আর্টিকেল
+            New Article
         </a>
     </div>
 
     <div class="flex gap-1 mb-4 text-sm flex-wrap">
         <a href="{{ route('admin.articles.index') }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(!request('status')) bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">সব</a>
-        <a href="{{ route('admin.articles.index', ['status' => 'published']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'published') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">প্রকাশিত</a>
-        <a href="{{ route('admin.articles.index', ['status' => 'submitted']) }}" class="px-3 py-1.5 border border-yellow-400 dark:border-yellow-600 @if(request('status') === 'submitted') bg-yellow-400 text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition font-medium">পর্যালোচনায়</a>
-        <a href="{{ route('admin.articles.index', ['status' => 'draft']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'draft') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">খসড়া</a>
-        <a href="{{ route('admin.articles.index', ['status' => 'scheduled']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'scheduled') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">নির্ধারিত</a>
+        <a href="{{ route('admin.articles.index', ['status' => 'published']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'published') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">Published</a>
+        <a href="{{ route('admin.articles.index', ['status' => 'submitted']) }}" class="px-3 py-1.5 border border-yellow-400 dark:border-yellow-600 @if(request('status') === 'submitted') bg-yellow-400 text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition font-medium">Pending Review</a>
+        <a href="{{ route('admin.articles.index', ['status' => 'draft']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'draft') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">Draft</a>
+        <a href="{{ route('admin.articles.index', ['status' => 'scheduled']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'scheduled') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">Scheduled</a>
         <a href="{{ route('admin.articles.index', ['status' => 'archived']) }}" class="px-3 py-1.5 border border-[#e0e0e0] dark:border-[#444] @if(request('status') === 'archived') bg-[#0d0d0d] text-white dark:bg-white dark:text-black @else text-[#666] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] @endif transition">আর্কাইভ</a>
     </div>
 
@@ -24,12 +24,12 @@
         <table class="w-full text-sm">
             <thead class="admin-table-header">
                 <tr>
-                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">শিরোনাম</th>
-                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">বিভাগ</th>
-                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">লেখক</th>
-                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">স্ট্যাটাস</th>
-                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">তারিখ</th>
-                    <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th>
+                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Title</th>
+                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Categories</th>
+                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Author</th>
+                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Status</th>
+                    <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Date</th>
+                    <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
@@ -40,7 +40,7 @@
                     <td class="p-3 text-[#666] text-xs">{{ $article->staffs->map(fn($s) => $s->name_bn)->join(', ') ?: $article->author?->name }}</td>
                     <td class="p-3">
                         <span class="badge-{{ $article->status }}">
-                            {{ $article->status === 'published' ? 'প্রকাশিত' : ($article->status === 'submitted' ? 'পর্যালোচনায়' : ($article->status === 'scheduled' ? 'নির্ধারিত' : 'খসড়া')) }}
+                            {{ $article->status === 'published' ? 'Published' : ($article->status === 'submitted' ? 'Pending Review' : ($article->status === 'scheduled' ? 'Scheduled' : 'Draft')) }}
                         </span>
                     </td>
                     <td class="p-3 text-[#666] text-xs">{{ $article->published_at?->format('d/m/Y H:i') ?? $article->created_at->format('d/m/Y') }}</td>

@@ -56,6 +56,6 @@ class ContactController extends Controller
     public function destroy(Contact $contact): RedirectResponse
     {
         $contact->delete();
-        return back()->with('success', 'বার্তা ডিলিট করা হয়েছে।');
+        return back()->with('success', 'Messages ডিলিট করা হয়েছে।');
     }
 }

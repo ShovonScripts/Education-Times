@@ -35,12 +35,18 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'এই একাউন্টে এডমিন অনুমতি নেই।']);
             }
 
+            if (Auth::user()->is_active === false) {
+                Auth::logout();
+                $request->session()->invalidate();
+                return back()->withErrors(['email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।']);
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
-            'email' => 'ইমেইল বা পাসওয়ার্ড ভুল।',
+            'email' => 'Email বা Password ভুল।',
         ])->onlyInput('email');
     }
 

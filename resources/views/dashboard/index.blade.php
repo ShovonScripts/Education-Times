@@ -222,11 +222,13 @@
                     <h2 class="font-bold text-lg mb-4 border-l-3 border-[#E02020] pl-3 dark:text-white">সংরক্ষিত সংবাদ</h2>
                     <div class="space-y-3">
                         @foreach($savedArticles as $saved)
+                        @if($saved->article)
                         <div class="pb-3 border-b border-[#e0e0e0] dark:border-[#333] last:border-0 last:pb-0">
                             <a href="{{ route('article.show', $saved->article->slug) }}"
                                 class="text-sm font-semibold hover:text-[#E02020] dark:hover:text-[#ff6b6b] transition-colors dark:text-[#e0e0e0]">{{ $saved->article->title_bn }}</a>
                             <p class="text-xs text-[#999] dark:text-[#777] mt-0.5">{{ $saved->article->published_at?->diffForHumans() }}</p>
                         </div>
+                        @endif
                         @endforeach
                     </div>
                     @if($savedArticles->count() >= 5)
@@ -245,7 +247,11 @@
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-xs text-[#999] dark:text-[#777]">{{ $comment->created_at->diffForHumans() }}</span>
                                 <span class="text-[#ccc] dark:text-[#555]">|</span>
-                                <a href="{{ route('article.show', $comment->article?->slug) }}" class="text-xs text-[#E02020] hover:text-red-700 transition">{{ $comment->article?->title_bn ?? '(অপসারিত)' }}</a>
+                                @if($comment->article)
+                                <a href="{{ route('article.show', $comment->article->slug) }}" class="text-xs text-[#E02020] hover:text-red-700 transition">{{ $comment->article->title_bn }}</a>
+                                @else
+                                <span class="text-xs text-[#999] dark:text-[#777]">(অপসারিত)</span>
+                                @endif
                             </div>
                         </div>
                         @endforeach

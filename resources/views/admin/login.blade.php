@@ -6,7 +6,7 @@
 <div class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-sm">
         <div class="text-center mb-8">
-            <a href="/" class="font-serif font-bold text-4xl text-[#0d0d0d] dark:text-[#e0e0e0]">PEN</a>
+            <a href="/" class="font-serif font-bold text-4xl text-[#0d0d0d] dark:text-[#e0e0e0]">ET</a>
             <p class="text-[#E02020] text-sm mt-1 font-semibold">এডমিন প্যানেল</p>
         </div>
 
@@ -26,12 +26,12 @@
             <form method="POST" action="{{ route('admin.login.attempt') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">ইমেইল</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}" required
                         class="w-full border border-[#e0e0e0] dark:border-[#444] px-4 py-2.5 text-sm focus:outline-none focus:border-[#E02020] dark:focus:border-[#ff6b6b] transition">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">পাসওয়ার্ড</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">Password</label>
                     <input type="password" name="password" required
                         class="w-full border border-[#e0e0e0] dark:border-[#444] px-4 py-2.5 text-sm focus:outline-none focus:border-[#E02020] dark:focus:border-[#ff6b6b] transition">
                 </div>

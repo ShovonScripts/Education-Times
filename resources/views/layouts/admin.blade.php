@@ -3,8 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'PEN এডমিন')</title>
+    <title>@yield('title', 'ET Admin')</title>
     <link rel="icon" type="image/x-icon" href="{{ \App\Models\Setting::get('site_favicon') ? Storage::url(\App\Models\Setting::get('site_favicon')) : asset('favicon.ico') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="apple-touch-icon" href="{{ \App\Models\Setting::get('site_favicon') ? Storage::url(\App\Models\Setting::get('site_favicon')) : asset('favicon.ico') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -20,14 +21,14 @@
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="flex items-center gap-3 w-full">
-                    <a href="{{ route('admin.dashboard') }}" class="font-serif font-bold text-lg shrink-0 dark:text-white">PEN <span class="text-[#E02020] dark:text-[#ff6b6b]">এডমিন</span></a>
+                    <a href="{{ route('admin.dashboard') }}" class="font-serif font-bold text-lg shrink-0 dark:text-white">ET <span class="text-[#E02020] dark:text-[#ff6b6b]">Admin</span></a>
                     <span class="text-[#ccc] dark:text-[#444] hidden sm:inline">|</span>
                     <a href="/" target="_blank" class="border border-[#e0e0e0] dark:border-[#444] text-xs text-[#666] dark:text-[#aaa] px-3 py-1.5 hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] hover:text-[#0d0d0d] dark:hover:text-white transition hidden sm:flex items-center gap-1.5 shrink-0">
                         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        সাইট দেখুন
+                        View Site
                     </a>
                     <div class="ml-auto flex items-center gap-3">
-                        <button type="button" id="darkModeToggleAdmin" class="text-[#666] dark:text-[#999] hover:text-[#0d0d0d] dark:hover:text-white transition p-1" title="ডার্ক মোড">
+                        <button type="button" id="darkModeToggleAdmin" class="text-[#666] dark:text-[#999] hover:text-[#0d0d0d] dark:hover:text-white transition p-1" title="Dark Mode">
                             <svg class="h-5 w-5" id="darkModeIconAdmin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                             </svg>
@@ -37,7 +38,7 @@
                             @csrf
                             <button type="submit" class="text-xs text-[#999] dark:text-[#777] hover:text-[#E02020] dark:hover:text-[#ff6b6b] transition flex items-center gap-1">
                                 <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                                লগআউট
+                                Logout
                             </button>
                         </form>
                     </div>

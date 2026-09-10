@@ -1,19 +1,19 @@
 @extends('layouts.admin')
-@section('title', 'নির্ধারিত পোস্ট')
+@section('title', 'Scheduled Posts')
 @section('content')
 <div class="flex items-center justify-between mb-5">
     <div>
         <div class="flex items-center gap-2">
             <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <h1 class="text-2xl font-bold">নির্ধারিত পোস্ট</h1>
+            <h1 class="text-2xl font-bold">Scheduled Posts</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি পোস্ট নির্ধারিত
+        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি Posts Scheduled
             @if($overdue > 0)<span class="text-red-600 font-medium ml-2">{{ $overdue }} টি প্রকাশের সময় পেরিয়ে গেছে</span>@endif
         </p>
     </div>
     <a href="{{ route('admin.posts.index') }}" class="border border-[#e0e0e0] text-[#666] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] transition flex items-center gap-1">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        সব পোস্ট
+        সব Posts
     </a>
 </div>
 
@@ -21,11 +21,11 @@
     <table class="w-full text-sm">
         <thead class="admin-table-header">
             <tr>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">পোস্ট</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">বিভাগ</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">নির্ধারিত সময়</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Posts</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">Categories</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Scheduled সময়</th>
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">বাকি</th>
-                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th>
+                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0]">
@@ -68,7 +68,7 @@
                         <form method="POST" action="{{ route('admin.posts.update-status', $article) }}" class="inline">
                             @csrf
                             <input type="hidden" name="status" value="draft">
-                            <button type="submit" class="text-[#666] hover:text-[#E02020] p-1.5 transition" title="খসড়ায় ফিরান" onclick="return confirm('নির্ধারিত সময় বাতিল করে খসড়ায় ফিরাবেন?')">
+                            <button type="submit" class="text-[#666] hover:text-[#E02020] p-1.5 transition" title="Draftয় ফিরান" onclick="return confirm('Scheduled সময় Cancel করে Draftয় ফিরাবেন?')">
                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </form>
@@ -76,7 +76,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="5" class="p-10 text-center text-sm text-[#999]">কোনো নির্ধারিত পোস্ট নেই</td></tr>
+            <tr><td colspan="5" class="p-10 text-center text-sm text-[#999]">কোনো Scheduled Posts নেই</td></tr>
             @endforelse
         </tbody>
     </table>

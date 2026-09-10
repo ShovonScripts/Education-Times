@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.users.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition"><span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> ব্যবহারকারী তালিকা</span></a>
+    <a href="{{ route('admin.users.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition"><span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> Users তালিকা</span></a>
 </div>
-<h1 class="font-serif text-2xl font-bold mb-6">ব্যবহারকারী এডিট: {{ $user->name }}</h1>
+<h1 class="font-serif text-2xl font-bold mb-6">Users এডিট: {{ $user->name }}</h1>
 
 <div class="bg-white dark:bg-[#1e1e1e] border border-[#e0e0e0] p-6 md:p-8">
     <form method="POST" action="{{ route('admin.users.update', $user) }}" class="space-y-4">
@@ -11,12 +11,12 @@
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-[#666] mb-1">নাম *</label>
+                <label class="block text-sm font-medium text-[#666] mb-1">Name *</label>
                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required
                     class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
             </div>
             <div>
-                <label class="block text-sm font-medium text-[#666] mb-1">ইমেইল *</label>
+                <label class="block text-sm font-medium text-[#666] mb-1">Email *</label>
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required
                     class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
             </div>
@@ -46,7 +46,7 @@
                     class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
             </div>
             <div>
-                <label class="block text-sm font-medium text-[#666] mb-1">বিদ্যালয়ের নাম</label>
+                <label class="block text-sm font-medium text-[#666] mb-1">বিদ্যালয়ের Name</label>
                 <input type="text" name="school_name" value="{{ old('school_name', $user->school_name) }}"
                     class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
             </div>
@@ -63,7 +63,7 @@
                 <label class="flex items-center gap-2 text-sm">
                     <input type="hidden" name="is_admin" value="0">
                     <input type="checkbox" name="is_admin" value="1" @checked($user->is_admin) class="accent-[#E02020]">
-                    <span>অ্যাডমিন</span>
+                    <span>Admins</span>
                 </label>
                 <label class="flex items-center gap-2 text-sm">
                     <input type="hidden" name="is_editor" value="0">
@@ -73,16 +73,16 @@
                 <label class="flex items-center gap-2 text-sm">
                     <input type="hidden" name="is_active" value="0">
                     <input type="checkbox" name="is_active" value="1" @checked($user->is_active) class="accent-green-600">
-                    <span>সক্রিয়</span>
+                    <span>Active</span>
                 </label>
             </div>
         </div>
 
         <div class="border-t border-[#e0e0e0] pt-4">
-            <p class="text-sm font-medium text-[#666] mb-3">পাসওয়ার্ড পরিবর্তন (শুধুমাত্র পরিবর্তন করতে চাইলে পূরণ করুন)</p>
+            <p class="text-sm font-medium text-[#666] mb-3">Password পরিবর্তন (শুধুমাত্র পরিবর্তন করতে চাইলে পূরণ করুন)</p>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-[#666] mb-1">নতুন পাসওয়ার্ড</label>
+                    <label class="block text-sm font-medium text-[#666] mb-1">নতুন Password</label>
                     <input type="password" name="password" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
                 </div>
                 <div>
@@ -93,7 +93,7 @@
         </div>
 
         <div class="flex justify-end gap-3 pt-4">
-            <a href="{{ route('admin.users.index') }}" class="border border-[#e0e0e0] text-[#666] px-6 py-2.5 text-sm hover:bg-[#f5f5f5] transition">বাতিল</a>
+            <a href="{{ route('admin.users.index') }}" class="border border-[#e0e0e0] text-[#666] px-6 py-2.5 text-sm hover:bg-[#f5f5f5] transition">Cancel</a>
             <button type="submit" class="bg-[#0d0d0d] dark:bg-[#333] text-white px-6 py-2.5 text-sm font-medium hover:bg-black dark:hover:bg-[#444] transition">আপডেট</button>
         </div>
     </form>
@@ -106,7 +106,7 @@
         @php
             $currentRole = $user->is_admin ? 'admin' : ($user->is_editor ? 'editor' : 'user');
         @endphp
-        @foreach(['admin' => 'অ্যাডমিন', 'editor' => 'এডিটর', 'user' => 'ব্যবহারকারী'] as $role => $label)
+        @foreach(['admin' => 'Admins', 'editor' => 'এডিটর', 'user' => 'Users'] as $role => $label)
         <form method="POST" action="{{ route('admin.users.toggle-role', $user) }}" class="inline">
             @csrf
             <input type="hidden" name="role" value="{{ $role }}">

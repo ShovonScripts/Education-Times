@@ -10,6 +10,7 @@ use App\Services\ArticleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class StaffArticleController extends Controller
@@ -37,7 +38,7 @@ class StaffArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'body_bn' => 'required|string',
             'excerpt_bn' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:500',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'video_url' => 'nullable|string|max:500',
             'tags' => 'nullable|string',
         ]);
@@ -47,7 +48,13 @@ class StaffArticleController extends Controller
         $validated['status'] = ArticleStatus::DRAFT->value;
         $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
+        unset($validated['featured_image']);
+
         $article = Article::create($validated);
+
+        if ($request->hasFile('featured_image')) {
+            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
+        }
 
         if (!empty($validated['tags'])) {
             $tags = explode(',', $validated['tags']);
@@ -83,31 +90,45 @@ class StaffArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'body_bn' => 'required|string',
             'excerpt_bn' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:500',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'video_url' => 'nullable|string|max:500',
             'tags' => 'nullable|string',
             'action' => 'required|in:save,submit',
         ]);
+
+        $featuredImage = $article->featured_image;
+
+        if ($request->hasFile('featured_image')) {
+            $article->deleteStoredImages();
+            $featuredImage = $request->file('featured_image')->store('articles', 'public');
+        } elseif ($request->boolean('remove_featured_image')) {
+            $article->deleteStoredImages();
+            $featuredImage = null;
+        }
+
+        unset($validated['featured_image']);
 
         $article->update([
             'title_bn' => $validated['title_bn'],
             'category_id' => $validated['category_id'],
             'body_bn' => $validated['body_bn'],
             'excerpt_bn' => $validated['excerpt_bn'] ?? null,
-            'featured_image' => $validated['featured_image'] ?? null,
+            'featured_image' => $featuredImage,
             'video_url' => $validated['video_url'] ?? null,
             'status' => $validated['action'] === 'submit' ? ArticleStatus::SUBMITTED->value : ArticleStatus::DRAFT->value,
             'reading_time_minutes' => $this->articleService->calculateReadingTime($validated['body_bn']),
         ]);
 
-        if (!empty($validated['tags'])) {
+        if (isset($validated['tags'])) {
             $article->tags()->delete();
-            $tags = explode(',', $validated['tags']);
-            foreach ($tags as $tag) {
-                ArticleTag::create([
-                    'article_id' => $article->id,
-                    'tag' => trim($tag),
-                ]);
+            if (!empty($validated['tags'])) {
+                $tags = explode(',', $validated['tags']);
+                foreach ($tags as $tag) {
+                    ArticleTag::create([
+                        'article_id' => $article->id,
+                        'tag' => trim($tag),
+                    ]);
+                }
             }
         }
 
@@ -123,7 +144,8 @@ class StaffArticleController extends Controller
         if ($article->author_id !== Auth::id()) {
             abort(403);
         }
-        $article->delete();
+        $article->deleteStoredImages();
+        $article->forceDelete();
         return redirect()->route('staff.articles.index')->with('success', 'আর্টিকেল ডিলিট করা হয়েছে!');
     }
 }

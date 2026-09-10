@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\User;
+use App\Traits\ClearsHomepageCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
 
 class PostController extends Controller
 {
+    use ClearsHomepageCache;
+
     public function index(Request $request): View
     {
         $query = Article::with(['author', 'category', 'staff', 'staffs']);
@@ -135,11 +138,13 @@ class PostController extends Controller
             $article->update(['slider_order' => $maxOrder + 1]);
         }
 
+        $this->clearHomepageCache();
+
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'state' => $article->$field,
-                'label' => $field === 'is_breaking' ? 'ব্রেকিং' : ($field === 'is_featured' ? 'ফিচারড' : ($field === 'is_slider' ? 'স্লাইডার' : 'এডিটরস পিক')),
+                'label' => $field === 'is_breaking' ? 'Breaking' : ($field === 'is_featured' ? 'Featured' : ($field === 'is_slider' ? 'Slider' : 'এডিটরস পিক')),
             ]);
         }
 
@@ -157,8 +162,10 @@ class PostController extends Controller
 
         $article->update($data);
 
-        $labels = ['published' => 'প্রকাশিত', 'draft' => 'খসড়া', 'submitted' => 'পর্যালোচনায়', 'archived' => 'আর্কাইভ'];
-        return back()->with('success', "স্ট্যাটাস '{$labels[$request->status]}' এ পরিবর্তন করা হয়েছে!");
+        $this->clearHomepageCache();
+
+        $labels = ['published' => 'Published', 'draft' => 'Draft', 'submitted' => 'Pending Review', 'archived' => 'আর্কাইভ'];
+        return back()->with('success', "Status '{$labels[$request->status]}' এ পরিবর্তন করা হয়েছে!");
     }
 
     public function updateSliderOrder(Request $request): JsonResponse
@@ -174,6 +181,8 @@ class PostController extends Controller
                 Article::where('id', $item['id'])->update(['slider_order' => $item['order']]);
             }
         });
+
+        $this->clearHomepageCache();
 
         return response()->json(['success' => true]);
     }
@@ -192,7 +201,10 @@ class PostController extends Controller
             'publish' => $articles->update(['status' => 'published', 'published_at' => DB::raw('COALESCE(published_at, NOW())')]),
             'draft' => $articles->update(['status' => 'draft']),
             'archive' => $articles->update(['status' => 'archived']),
-            'delete' => $articles->delete(),
+            'delete' => (function () use ($articles) {
+                $articles->get()->each(fn ($article) => $article->deleteStoredImages());
+                $articles->forceDelete();
+            })(),
             'breaking' => $articles->update(['is_breaking' => true]),
             'featured' => $articles->update(['is_featured' => true]),
             'slider' => $articles->update(['is_slider' => true]),
@@ -202,6 +214,8 @@ class PostController extends Controller
             default => null,
         };
 
-        return back()->with('success', 'বাল্ক অ্যাকশন সম্পন্ন!');
+        $this->clearHomepageCache();
+
+        return back()->with('success', 'বাল্ক Action সম্পন্ন!');
     }
 }

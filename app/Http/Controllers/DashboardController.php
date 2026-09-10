@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\ArticleTag;
 use App\Models\Category;
+use App\Services\ArticleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    public function __construct(private ArticleService $articleService) {}
+
     public function index(): View
     {
         $user = Auth::user()->load('district');
@@ -81,11 +83,11 @@ class DashboardController extends Controller
         $validated['slug'] = $slug;
         $validated['author_id'] = Auth::id();
         $validated['status'] = 'submitted';
-        $validated['reading_time_minutes'] = $this->calculateReadingTime($validated['body_bn']);
+        $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
         if ($request->hasFile('featured_image')) {
             $validated['featured_image'] = $request->file('featured_image')
-                ->store('featured-images', 'public');
+                ->store('articles', 'public');
         } else {
             $validated['featured_image'] = null;
         }
@@ -104,14 +106,5 @@ class DashboardController extends Controller
 
         return redirect()->route('dashboard')
             ->with('success', 'আপনার পোস্ট জমা দেওয়া হয়েছে! পর্যালোচনার পর তা প্রকাশ করা হবে।');
-    }
-
-    private function calculateReadingTime(string $html): int
-    {
-        $text = strip_tags($html);
-        $words = preg_split('/\s+/u', trim($text));
-        $wordCount = count($words);
-        $minutes = (int) ceil($wordCount / 200);
-        return max(1, $minutes);
     }
 }

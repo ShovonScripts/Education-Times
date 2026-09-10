@@ -14,7 +14,7 @@
     <div class="flex min-h-screen">
         <aside id="staffSidebar" class="w-56 bg-[#0d0d0d] dark:bg-[#0a0a0a] text-white hidden md:flex flex-col shrink-0">
             <div class="h-14 flex items-center px-5 border-b border-white/10">
-                <a href="{{ route('staff.articles.index') }}" class="font-serif font-bold text-base">PEN <span class="text-[#E02020]">স্টাফ</span></a>
+                <a href="{{ route('staff.articles.index') }}" class="font-serif font-bold text-base">ET <span class="text-[#E02020]">স্টাফ</span></a>
             </div>
             <nav class="flex-1 py-4 px-3 space-y-1 text-sm overflow-y-auto">
                 <a href="{{ route('staff.articles.index') }}"
@@ -44,7 +44,7 @@
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div class="flex items-center gap-3 w-full">
-                    <a href="{{ route('staff.articles.index') }}" class="font-serif font-bold text-lg shrink-0">PEN <span class="text-[#E02020]">স্টাফ</span></a>
+                    <a href="{{ route('staff.articles.index') }}" class="font-serif font-bold text-lg shrink-0">ET <span class="text-[#E02020]">স্টাফ</span></a>
                     <span class="text-[#ccc] dark:text-[#555] hidden sm:inline">|</span>
                     <a href="/" target="_blank" class="text-xs text-[#999] dark:text-[#777] hover:text-[#E02020] dark:hover:text-[#ff6b6b] transition hidden sm:block">সাইট দেখুন →</a>
                     <div class="ml-auto flex items-center gap-3">

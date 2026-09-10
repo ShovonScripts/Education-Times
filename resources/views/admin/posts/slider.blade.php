@@ -1,17 +1,17 @@
 @extends('layouts.admin')
-@section('title', 'স্লাইডার ম্যানেজার')
+@section('title', 'Slider Manager')
 @section('content')
 <div class="flex items-center justify-between mb-5">
     <div>
         <div class="flex items-center gap-2">
             <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <h1 class="text-2xl font-bold">স্লাইডার ম্যানেজার</h1>
+            <h1 class="text-2xl font-bold">Slider Manager</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $articles->count() }} টি স্লাইডার পোস্ট</p>
+        <p class="text-xs text-[#999] mt-0.5">{{ $articles->count() }} টি Slider Posts</p>
     </div>
     <a href="{{ route('admin.posts.index') }}" class="border border-[#e0e0e0] text-[#666] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] transition flex items-center gap-1">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        সব পোস্ট
+        সব Posts
     </a>
 </div>
 
@@ -19,8 +19,8 @@
     <div class="lg:col-span-2">
         <div class="admin-card">
             <div class="px-5 py-3 border-b border-[#e0e0e0] dark:border-[#333] flex items-center justify-between">
-                <h2 class="text-sm font-bold">স্লাইডার পোস্টসমূহ</h2>
-                <span class="text-xs text-[#999]">ড্র্যাগ করে অর্ডার পরিবর্তন করুন</span>
+                <h2 class="text-sm font-bold">Slider Postsসমূহ</h2>
+                <span class="text-xs text-[#999]">ড্র্যাগ করে অর্ডার Change</span>
             </div>
             <div id="sliderList" class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
                 @forelse($articles as $article)
@@ -30,7 +30,7 @@
                     </span>
                     <div class="w-14 h-14 bg-[#f5f5f5] dark:bg-[#2a2a2a] border border-[#e0e0e0] dark:border-[#333] shrink-0 overflow-hidden flex items-center justify-center text-[#ccc] text-xs">
                         @if($article->featured_image)
-                        <img src="{{ $article->featured_image }}" alt="" class="w-full h-full object-cover">
+                        <img src="{{ $article->featured_image_url }}" alt="" class="w-full h-full object-cover">
                         @else
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         @endif
@@ -40,35 +40,35 @@
                         <p class="text-xs text-[#999]">{{ $article->category?->name_bn }} — {{ $article->published_at?->format('d/m/Y') }}</p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" onclick="removeFromSlider({{ $article->id }})" class="text-xs text-[#999] hover:text-[#E02020] transition px-2 py-1 border border-[#e0e0e0] dark:border-[#444] hover:border-red-300" title="স্লাইডার থেকে সরান">
+                        <button type="button" onclick="removeFromSlider({{ $article->id }})" class="text-xs text-[#999] hover:text-[#E02020] transition px-2 py-1 border border-[#e0e0e0] dark:border-[#444] hover:border-red-300" title="Slider থেকে সরান">
                             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
                 @empty
                 <div class="p-10 text-center text-sm text-[#999]">
-                    <p class="mb-1">কোনো স্লাইডার পোস্ট নেই</p>
-                    <p class="text-xs">নিচের তালিকা থেকে পোস্ট স্লাইডার হিসেবে যুক্ত করুন</p>
+                    <p class="mb-1">কোনো Slider Posts নেই</p>
+                    <p class="text-xs">নিচের তালিকা থেকে Posts Slider হিসেবে যুক্ত করুন</p>
                 </div>
                 @endforelse
             </div>
         </div>
         <div class="mt-4 text-right">
-            <button type="button" onclick="saveSliderOrder()" class="btn-primary" id="saveOrderBtn" style="display:none">অর্ডার সংরক্ষণ করুন</button>
+            <button type="button" onclick="saveSliderOrder()" class="btn-primary" id="saveOrderBtn" style="display:none">অর্ডার Save</button>
         </div>
     </div>
 
     <div>
         <div class="admin-card">
             <div class="px-5 py-3 border-b border-[#e0e0e0] dark:border-[#333]">
-                <h2 class="text-sm font-bold">পোস্ট যুক্ত করুন</h2>
+                <h2 class="text-sm font-bold">Posts যুক্ত করুন</h2>
             </div>
             <div class="divide-y divide-[#e0e0e0] dark:divide-[#333] max-h-[600px] overflow-y-auto">
                 @forelse($available as $article)
                 <div class="flex items-center gap-3 px-5 py-3 admin-hover-row">
                     <div class="w-10 h-10 bg-[#f5f5f5] dark:bg-[#2a2a2a] border border-[#e0e0e0] dark:border-[#333] shrink-0 overflow-hidden flex items-center justify-center text-[#ccc] text-xs">
                         @if($article->featured_image)
-                        <img src="{{ $article->featured_image }}" alt="" class="w-full h-full object-cover">
+                        <img src="{{ $article->featured_image_url }}" alt="" class="w-full h-full object-cover">
                         @else
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         @endif
@@ -80,12 +80,12 @@
                     <div class="inline shrink-0">
                         <button type="button" onclick="addToSlider({{ $article->id }})" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium whitespace-nowrap flex items-center gap-0.5">
                             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            স্লাইডার
+                            Slider
                         </button>
                     </div>
                 </div>
                 @empty
-                <div class="p-6 text-center text-sm text-[#999]">সব পাবলিশড পোস্ট ইতিমধ্যে স্লাইডারে আছে</div>
+                <div class="p-6 text-center text-sm text-[#999]">সব পাবলিশড Posts ইতিমধ্যে Sliderে আছে</div>
                 @endforelse
             </div>
         </div>
@@ -146,7 +146,7 @@ function saveSliderOrder() {
 }
 
 function addToSlider(id) { toggleArticleFlag(id, 'is_slider'); }
-function removeFromSlider(id) { if (confirm('স্লাইডার থেকে সরাবেন?')) toggleArticleFlag(id, 'is_slider'); }
+function removeFromSlider(id) { if (confirm('Slider থেকে সরাবেন?')) toggleArticleFlag(id, 'is_slider'); }
 function toggleArticleFlag(id, flag) {
     fetch('{{ route("admin.posts.toggle-flag", ["article" => 0]) }}'.replace('/0', '/' + id), {
         method: 'POST',

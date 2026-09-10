@@ -25,7 +25,8 @@ class SettingController extends Controller
     public function clearCache(): RedirectResponse
     {
         Artisan::call('optimize:clear');
-        return back()->with('success', 'সমস্ত ক্যাশ সাফ করা হয়েছে! (config, route, view, cache, compiled)');
+        Setting::clearCache();
+        return back()->with('success', 'All cache cleared! (config, route, view, cache, compiled)');
     }
 
     public function clearData(): RedirectResponse
@@ -34,7 +35,7 @@ class SettingController extends Controller
         if (class_exists(ActivityLog::class)) {
             ActivityLog::truncate();
         }
-        return back()->with('success', 'পেজ ভিউ ও অ্যাক্টিভিটি লগ ডাটা সাফ করা হয়েছে!');
+        return back()->with('success', 'Pages ভিউ ও Activity লগ ডাটা সাফ করা হয়েছে!');
     }
 
     public function update(Request $request): RedirectResponse
@@ -44,6 +45,7 @@ class SettingController extends Controller
             'site_name_en' => 'nullable|string|max:255',
             'site_tagline' => 'nullable|string|max:500',
             'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:2048',
+            'site_footer_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:2048',
             'site_favicon' => 'nullable|image|mimes:png,ico,jpg,jpeg|max:1024',
             'site_loader' => 'nullable|image|mimes:gif,png,svg|max:2048',
             'loader_enabled' => 'nullable|in:0,1',
@@ -70,21 +72,33 @@ class SettingController extends Controller
             'email_encryption' => 'nullable|string|in:tls,ssl,null|max:10',
             'email_from_address' => 'nullable|email|max:255',
             'email_from_name' => 'nullable|string|max:255',
+
+            // Footer editorial
+            'editor_name' => 'nullable|string|max:255',
+            'editor_designation' => 'nullable|string|max:255',
+            'publisher_name' => 'nullable|string|max:255',
+            'footer_tagline' => 'nullable|string|max:500',
+
+            // Homepage section controls
+            'newsletter_title' => 'nullable|string|max:255',
+            'newsletter_pitch' => 'nullable|string|max:1000',
+            'hero_breaking_label' => 'nullable|string|max:50',
+            'hero_section_titles' => 'nullable|string|max:2000', // JSON map: section_key => label
         ];
 
         $validated = $request->validate($rules);
 
         foreach ($validated as $key => $value) {
-            if (in_array($key, ['site_logo', 'site_favicon', 'site_loader']) && $request->hasFile($key)) {
+            if (in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader']) && $request->hasFile($key)) {
                 $file = $request->file($key);
                 $path = $file->store('settings', 'public');
                 Setting::set($key, $path);
-            } elseif (!in_array($key, ['site_logo', 'site_favicon', 'site_loader'])) {
+            } elseif (!in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader'])) {
                 Setting::set($key, $value ?? '');
             }
         }
 
         return redirect()->route('admin.settings.index', ['tab' => $request->tab ?? 'general'])
-            ->with('success', 'সেটিংস আপডেট হয়েছে!');
+            ->with('success', 'Settings আপডেট হয়েছে!');
     }
 }

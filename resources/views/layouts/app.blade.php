@@ -2,7 +2,12 @@
 <html lang="bn">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name'))</title>
     <link rel="icon" type="image/x-icon" href="{{ \App\Models\Setting::get('site_favicon') ? Storage::url(\App\Models\Setting::get('site_favicon')) : asset('favicon.ico') }}">
@@ -10,22 +15,56 @@
     @hasSection('meta_description')
     <meta name="description" content="@yield('meta_description')">
     @endif
+    @hasSection('canonical')
+    <link rel="canonical" href="@yield('canonical')">
+    @endif
+    <meta property="og:title" content="@yield('title', config('app.name'))">
+    <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('site_tagline', ''))">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
-    <script>if(localStorage.getItem('darkMode')==='true'||(!localStorage.getItem('darkMode')&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark');</script>
+    <script>
+    (function() {
+        var stored = localStorage.getItem('etTheme');
+        if (stored === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    })();
+    </script>
 </head>
-<body class="bg-[#f5f5f5] dark:bg-[#121212] text-[#1a1a1a] dark:text-[#e0e0e0] font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-white text-[#111] font-sans antialiased min-h-screen flex flex-col pb-14 md:pb-0">
+    <div id="reading-progress" aria-hidden="true"></div>
     @include('partials.ads.popup')
     @include('partials.header')
-    @include('partials.ads.header')
     <main class="flex-1 w-full">
         @yield('content')
     </main>
-    @include('partials.ads.footer')
     @include('partials.footer')
-    <button id="scrollTop" class="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-[#E02020] text-white shadow-lg hover:bg-red-700 transition-all duration-300 flex items-center justify-center opacity-0 pointer-events-none">
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+    @include('partials.bottom-nav')
+
+    <button id="scrollTop" class="fixed bottom-20 md:bottom-6 right-6 z-40 w-10 h-10 bg-[#111] hover:bg-black text-white shadow-md transition flex items-center justify-center opacity-0 pointer-events-none" aria-label="Back to top">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
     </button>
+    <script>
+    (function() {
+        var btn = document.getElementById('scrollTop');
+        if (btn) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 400) {
+                    btn.classList.remove('opacity-0', 'pointer-events-none');
+                    btn.classList.add('opacity-100');
+                } else {
+                    btn.classList.add('opacity-0', 'pointer-events-none');
+                    btn.classList.remove('opacity-100');
+                }
+            });
+            btn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    })();
+    </script>
     @stack('scripts')
 </body>
 </html>

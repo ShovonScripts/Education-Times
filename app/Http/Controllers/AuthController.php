@@ -25,7 +25,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
             'phone' => 'required|string|max:20|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
             'district_id' => 'required|exists:districts,id',
             'upazila' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
@@ -62,9 +62,16 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+            if ($user->is_active === false) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।',
+                ])->onlyInput('email');
+            }
             $request->session()->regenerate();
 
-            if (Auth::user()->is_admin) {
+            if ($user->is_admin) {
                 return redirect()->intended(route('admin.dashboard'));
             }
 

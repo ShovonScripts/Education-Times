@@ -15,8 +15,17 @@ class AdminMiddleware
             return redirect()->route('admin.login');
         }
 
-        if (!Auth::user()->is_admin) {
+        $user = Auth::user();
+
+        if (!$user->is_admin) {
             abort(403, 'Unauthorized access.');
+        }
+
+        if ($user->is_active === false) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('admin.login')->withErrors(['email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।']);
         }
 
         return $next($request);

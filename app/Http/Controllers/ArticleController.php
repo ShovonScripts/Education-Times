@@ -14,7 +14,7 @@ class ArticleController extends Controller
     {
         $article = Article::where('slug', $slug)
             ->where('status', 'published')
-            ->with(['author', 'category', 'district', 'staffs'])
+            ->with(['author', 'category', 'district', 'staffs', 'tags'])
             ->firstOrFail();
 
         $related = Article::where('status', 'published')

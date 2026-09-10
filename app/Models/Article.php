@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Article extends Model
 {
@@ -104,5 +105,48 @@ class Article extends Model
     public function getHasVideoAttribute(): bool
     {
         return $this->youTubeEmbed !== null;
+    }
+
+    /**
+     * Resolve the featured image to a browser-ready URL.
+     * Absolute URLs pass through as-is; local paths resolve via the public disk.
+     */
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        return $this->resolveLocalImage($this->featured_image);
+    }
+
+    public function getOgImageUrlAttribute(): ?string
+    {
+        return $this->resolveLocalImage($this->og_image);
+    }
+
+    private function resolveLocalImage(mixed $value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+        if (preg_match('#^(https?:)?//|data:#i', (string) $value)) {
+            return (string) $value;
+        }
+        return Storage::disk('public')->url((string) $value);
+    }
+
+    /**
+     * Delete locally-stored image files that belong to this article.
+     * Remote URLs are skipped。
+     */
+    public function deleteStoredImages(): void
+    {
+        foreach (['featured_image', 'og_image'] as $field) {
+            $value = $this->{$field} ?? null;
+            if (empty($value)) {
+                continue;
+            }
+            if (preg_match('#^(https?:)?//|data:#i', (string) $value)) {
+                continue;
+            }
+            Storage::disk('public')->delete((string) $value);
+        }
     }
 }

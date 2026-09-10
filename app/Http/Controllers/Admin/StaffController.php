@@ -28,7 +28,7 @@ class StaffController extends Controller
             'name_en' => 'nullable|string|max:255',
             'designation_bn' => 'required|string|max:255',
             'designation_en' => 'nullable|string|max:255',
-            'staff_type' => 'required|in:editor,reporter,advisor,management',
+            'staff_type' => 'required|in:editor,reporter,advisor,columnist,correspondent,management',
             'bio_bn' => 'nullable|string',
             'bio_en' => 'nullable|string',
             'photo' => 'nullable|string|max:500',
@@ -43,7 +43,7 @@ class StaffController extends Controller
         Staff::create($validated);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'স্টাফ যোগ করা হয়েছে।');
+            ->with('success', 'Staff যোগ করা হয়েছে।');
     }
 
     public function edit(Staff $staff): View
@@ -58,7 +58,7 @@ class StaffController extends Controller
             'name_en' => 'nullable|string|max:255',
             'designation_bn' => 'required|string|max:255',
             'designation_en' => 'nullable|string|max:255',
-            'staff_type' => 'required|in:editor,reporter,advisor,management',
+            'staff_type' => 'required|in:editor,reporter,advisor,columnist,correspondent,management',
             'bio_bn' => 'nullable|string',
             'bio_en' => 'nullable|string',
             'photo' => 'nullable|string|max:500',
@@ -73,13 +73,13 @@ class StaffController extends Controller
         $staff->update($validated);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'স্টাফ আপডেট করা হয়েছে।');
+            ->with('success', 'Staff আপডেট করা হয়েছে।');
     }
 
     public function destroy(Staff $staff): RedirectResponse
     {
         $staff->delete();
         return redirect()->route('admin.staff.index')
-            ->with('success', 'স্টাফ ডিলিট করা হয়েছে।');
+            ->with('success', 'Staff ডিলিট করা হয়েছে।');
     }
 }

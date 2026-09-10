@@ -3,17 +3,17 @@
 <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-2">
         <svg class="h-6 w-6 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-        <h1 class="text-2xl font-bold">নথি</h1>
+        <h1 class="text-2xl font-bold">Archives</h1>
     </div>
     <a href="{{ route('admin.archive.create') }}" class="btn-primary flex items-center gap-1.5">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        নতুন নথি
+        নতুন Archives
     </a>
 </div>
 <div class="admin-card overflow-hidden">
     <table class="w-full text-sm">
         <thead class="admin-table-header">
-            <tr><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">শিরোনাম</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">বিষয়</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">সাল</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">ফাইল</th><th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th></tr>
+            <tr><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Title</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">বিষয়</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">সাল</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">File</th><th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th></tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
             @forelse($documents as $doc)
@@ -28,7 +28,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="5" class="p-6 text-center text-[#999]">কোনো নথি নেই।</td></tr>
+            <tr><td colspan="5" class="p-6 text-center text-[#999]">কোনো Archives নেই।</td></tr>
             @endforelse
         </tbody>
     </table>

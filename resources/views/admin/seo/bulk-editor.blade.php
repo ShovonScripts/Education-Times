@@ -1,32 +1,32 @@
 @extends('layouts.admin')
-@section('title', 'বাল্ক SEO এডিটর')
+@section('title', 'Bulk SEO এডিটর')
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div>
         <div class="flex items-center gap-2">
             <svg class="h-5 w-5 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-            <h1 class="text-2xl font-bold">বাল্ক SEO এডিটর</h1>
+            <h1 class="text-2xl font-bold">Bulk SEO এডিটর</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি পোস্ট ({{ $total }} টি মোট)</p>
+        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি Posts ({{ $total }} টি মোট)</p>
     </div>
     <div class="flex items-center gap-2">
         <a href="{{ route('admin.seo.dashboard') }}" class="border border-[#e0e0e0] dark:border-[#444] text-[#666] dark:text-[#aaa] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition flex items-center gap-1">
             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            SEO ড্যাশবোর্ড
+            SEO Dashboard
         </a>
     </div>
 </div>
 
 <form method="GET" action="{{ route('admin.seo.bulk-editor') }}" class="flex flex-wrap items-center gap-2 mb-5">
-    <input type="text" name="search" placeholder="শিরোনাম খুঁজুন..." value="{{ request('search') }}" class="admin-input min-w-[200px]">
+    <input type="text" name="search" placeholder="Title খুঁজুন..." value="{{ request('search') }}" class="admin-input min-w-[200px]">
     <select name="status" class="admin-select">
-        <option value="">সব স্ট্যাটাস</option>
-        <option value="published" @selected(request('status') === 'published')>প্রকাশিত</option>
-        <option value="draft" @selected(request('status') === 'draft')>খসড়া</option>
-        <option value="submitted" @selected(request('status') === 'submitted')>পর্যালোচনায়</option>
+        <option value="">সব Status</option>
+        <option value="published" @selected(request('status') === 'published')>Published</option>
+        <option value="draft" @selected(request('status') === 'draft')>Draft</option>
+        <option value="submitted" @selected(request('status') === 'submitted')>Pending Review</option>
     </select>
     <select name="category_id" class="admin-select">
-        <option value="">সব বিভাগ</option>
+        <option value="">সব Categories</option>
         @foreach($categories as $cat)
         <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>{{ $cat->name_bn }}</option>
         @endforeach
@@ -36,7 +36,7 @@
         <option value="no_meta_title" @selected(request('seo_issue') === 'no_meta_title')>মেটা টাইটেল নেই</option>
         <option value="no_meta_desc" @selected(request('seo_issue') === 'no_meta_desc')>মেটা ডেসক্রিপশন নেই</option>
         <option value="no_og_image" @selected(request('seo_issue') === 'no_og_image')>OG ইমেজ নেই</option>
-        <option value="no_keywords" @selected(request('seo_issue') === 'no_keywords')>কীওয়ার্ড নেই</option>
+        <option value="no_keywords" @selected(request('seo_issue') === 'no_keywords')>Keywords নেই</option>
     </select>
     <button type="submit" class="btn-primary text-sm">ফিল্টার</button>
     <a href="{{ route('admin.seo.bulk-editor') }}" class="text-xs text-[#999] hover:text-[#E02020]">রিসেট</a>
@@ -48,7 +48,7 @@
         <table class="w-full text-sm">
             <thead class="admin-table-header">
                 <tr>
-                    <th class="text-left p-2.5 font-semibold text-[#666] text-xs uppercase tracking-wider w-[200px] min-w-[180px]">পোস্ট</th>
+                    <th class="text-left p-2.5 font-semibold text-[#666] text-xs uppercase tracking-wider w-[200px] min-w-[180px]">Posts</th>
                     <th class="text-left p-2.5 font-semibold text-[#666] text-xs uppercase tracking-wider min-w-[200px]">Meta Title <span class="text-[10px] font-normal text-[#999]">(30-60 chars)</span></th>
                     <th class="text-left p-2.5 font-semibold text-[#666] text-xs uppercase tracking-wider min-w-[220px]">Meta Description <span class="text-[10px] font-normal text-[#999]">(50-160 chars)</span></th>
                     <th class="text-left p-2.5 font-semibold text-[#666] text-xs uppercase tracking-wider min-w-[150px]">Keywords</th>
@@ -87,7 +87,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="p-8 text-center text-sm text-[#999]">কোনো পোস্ট পাওয়া যায়নি</td></tr>
+                <tr><td colspan="6" class="p-8 text-center text-sm text-[#999]">কোনো Posts পাওয়া যায়নি</td></tr>
                 @endforelse
             </tbody>
         </table>

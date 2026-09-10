@@ -3,14 +3,14 @@
 <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-2">
         <svg class="h-6 w-6 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <h1 class="text-2xl font-bold">মন্তব্য</h1>
-        <span class="text-xs text-[#999]">সকল মন্তব্য</span>
+        <h1 class="text-2xl font-bold">Comments</h1>
+        <span class="text-xs text-[#999]">সকল Comments</span>
     </div>
 </div>
 <div class="admin-card overflow-hidden">
     <table class="w-full text-sm">
         <thead class="admin-table-header">
-            <tr><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">মন্তব্য</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">আর্টিকেল</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">ব্যবহারকারী</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">স্ট্যাটাস</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">তারিখ</th><th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th></tr>
+            <tr><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Comments</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">আর্টিকেল</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Users</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Status</th><th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Date</th><th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th></tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
             @forelse($comments as $comment)
@@ -38,7 +38,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="p-6 text-center text-[#999]">কোনো মন্তব্য নেই।</td></tr>
+            <tr><td colspan="6" class="p-6 text-center text-[#999]">কোনো Comments নেই।</td></tr>
             @endforelse
         </tbody>
     </table>

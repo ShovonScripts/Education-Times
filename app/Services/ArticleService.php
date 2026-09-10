@@ -30,7 +30,7 @@ class ArticleService
     private function slugExists(string $slug, ?int $ignoreId): bool
     {
         $query = Article::where('slug', $slug);
-        if ($ignoreId) {
+        if (!is_null($ignoreId)) {
             $query->where('id', '!=', $ignoreId);
         }
         return $query->exists();

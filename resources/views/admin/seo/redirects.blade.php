@@ -1,22 +1,22 @@
 @extends('layouts.admin')
-@section('title', '301 রিডাইরেক্ট ম্যানেজার')
+@section('title', '301 Redirects Manager')
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div>
         <div class="flex items-center gap-2">
             <svg class="h-5 w-5 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <h1 class="text-2xl font-bold">301 রিডাইরেক্ট ম্যানেজার</h1>
+            <h1 class="text-2xl font-bold">301 Redirects Manager</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $redirects->total() }} টি রিডাইরেক্ট</p>
+        <p class="text-xs text-[#999] mt-0.5">{{ $redirects->total() }} টি Redirects</p>
     </div>
     <a href="{{ route('admin.seo.dashboard') }}" class="border border-[#e0e0e0] dark:border-[#444] text-[#666] dark:text-[#aaa] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition flex items-center gap-1">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        SEO ড্যাশবোর্ড
+        SEO Dashboard
     </a>
 </div>
 
 <div class="admin-card p-5 mb-6">
-    <h2 class="text-sm font-bold mb-3">নতুন রিডাইরেক্ট</h2>
+    <h2 class="text-sm font-bold mb-3">নতুন Redirects</h2>
     <form method="POST" action="{{ route('admin.seo.redirects.store') }}" class="flex flex-wrap items-end gap-3">
         @csrf
         <div class="flex-1 min-w-[180px]">
@@ -37,7 +37,7 @@
                 <option value="302">302 (অস্থায়ী)</option>
             </select>
         </div>
-        <button type="submit" class="btn-primary">যোগ করুন</button>
+        <button type="submit" class="btn-primary">Add</button>
     </form>
 </div>
 
@@ -49,8 +49,8 @@
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">নতুন URL</th>
                 <th class="text-center p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[60px]">টাইপ</th>
                 <th class="text-center p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[60px] hidden sm:table-cell">হিট</th>
-                <th class="text-center p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[60px]">স্ট্যাটাস</th>
-                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[100px]">অ্যাকশন</th>
+                <th class="text-center p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[60px]">Status</th>
+                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider w-[100px]">Action</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
@@ -72,7 +72,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="p-8 text-center text-sm text-[#999]">কোনো রিডাইরেক্ট নেই</td></tr>
+            <tr><td colspan="6" class="p-8 text-center text-sm text-[#999]">কোনো Redirects নেই</td></tr>
             @endforelse
         </tbody>
     </table>
@@ -82,7 +82,7 @@
 <div id="editRedirectModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
     <div class="admin-card w-full max-w-lg mx-4 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="font-bold">রিডাইরেক্ট এডিট</h2>
+            <h2 class="font-bold">Redirects এডিট</h2>
             <button type="button" onclick="document.getElementById('editRedirectModal').classList.add('hidden')" class="text-[#999] hover:text-[#0d0d0d]">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -113,13 +113,13 @@
                         <label class="flex items-center gap-2 text-sm mt-6">
                             <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" name="is_active" id="editIsActive" value="1" class="h-4 w-4 accent-[#0d0d0d]">
-                            <span class="text-xs">সক্রিয়</span>
+                            <span class="text-xs">Active</span>
                         </label>
                     </div>
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="document.getElementById('editRedirectModal').classList.add('hidden')" class="btn-outline">বাতিল</button>
+                <button type="button" onclick="document.getElementById('editRedirectModal').classList.add('hidden')" class="btn-outline">Cancel</button>
                 <button type="submit" class="btn-primary">আপডেট</button>
             </div>
         </form>

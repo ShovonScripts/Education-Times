@@ -26,10 +26,9 @@ class SeoController extends Controller
         $notIndexable = Article::where('indexable', false)->count();
         $shortTitle = Article::where('status', 'published')
             ->where(function ($q) {
-                $q->whereNull('meta_title')->orWhere('meta_title', '');
-            })
-            ->orWhere(function ($q) {
-                $q->where('status', 'published')->whereRaw('LENGTH(meta_title) < 30');
+                $q->whereNull('meta_title')
+                    ->orWhere('meta_title', '')
+                    ->whereRaw('LENGTH(meta_title) < 30');
             })
             ->count();
         $shortDesc = Article::where('status', 'published')
@@ -44,8 +43,8 @@ class SeoController extends Controller
             ['label' => 'মেটা টাইটেল নেই', 'count' => $noMetaTitle, 'icon' => 'meta-title', 'severity' => 'high'],
             ['label' => 'মেটা ডেসক্রিপশন নেই', 'count' => $noMetaDesc, 'icon' => 'meta-desc', 'severity' => 'high'],
             ['label' => 'OG ইমেজ নেই', 'count' => $noOgImage, 'icon' => 'og-image', 'severity' => 'medium'],
-            ['label' => 'ফোকাস কীওয়ার্ড নেই', 'count' => $noFocusKw, 'icon' => 'keywords', 'severity' => 'medium'],
-            ['label' => 'ইন্ডেক্স করা যাচ্ছে না', 'count' => $notIndexable, 'icon' => 'no-index', 'severity' => 'low'],
+            ['label' => 'ফোকাস Keywords নেই', 'count' => $noFocusKw, 'icon' => 'keywords', 'severity' => 'medium'],
+            ['label' => 'ইন্ডেক্স করা যাচ্ছে No', 'count' => $notIndexable, 'icon' => 'no-index', 'severity' => 'low'],
             ['label' => 'শর্ট meta_title (<30 chars)', 'count' => $shortTitle, 'icon' => 'short-title', 'severity' => 'medium'],
             ['label' => 'শর্ট meta_desc (<50 chars)', 'count' => $shortDesc, 'icon' => 'short-desc', 'severity' => 'medium'],
         ];
@@ -116,7 +115,7 @@ class SeoController extends Controller
         return back()->with('success', count($request->articles) . ' টি আর্টিকেলের SEO আপডেট হয়েছে!');
     }
 
-    public function sitemap(): \Illuminate\Support\Facades\Response
+    public function sitemap(): \Illuminate\Http\Response
     {
         $articles = Article::where('status', 'published')->where('indexable', true)->latest('published_at')->get();
         $categories = Category::where('is_active', true)->get();
@@ -137,7 +136,7 @@ class SeoController extends Controller
             $xml .= '<changefreq>daily</changefreq>';
             $xml .= '<news:news>';
             $xml .= '<news:publication_date>' . $article->published_at->toIso8601String() . '</news:publication_date>';
-            $xml .= '<news:title>' . strip_tags($article->title_bn) . '</news:title>';
+            $xml .= '<news:title>' . htmlspecialchars($article->title_bn, ENT_XML1, 'UTF-8') . '</news:title>';
             $xml .= '</news:news>';
             $xml .= '</url>';
         }
@@ -160,7 +159,7 @@ class SeoController extends Controller
         return back()->with('success', 'robots.txt আপডেট হয়েছে!');
     }
 
-    public function showRobotsTxt(): \Illuminate\Support\Facades\Response
+    public function showRobotsTxt(): \Illuminate\Http\Response
     {
         $robots = Setting::get('robots_txt', "User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'));
         return response($robots)->header('Content-Type', 'text/plain');
@@ -183,7 +182,7 @@ class SeoController extends Controller
         $validated['old_url'] = '/' . ltrim($validated['old_url'], '/');
         Redirect::create($validated);
 
-        return redirect()->route('admin.seo.redirects')->with('success', 'রিডাইরেক্ট তৈরি করা হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects তৈরি করা হয়েছে!');
     }
 
     public function redirectUpdate(Request $request, Redirect $redirect): RedirectResponse
@@ -199,13 +198,13 @@ class SeoController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $redirect->update($validated);
 
-        return redirect()->route('admin.seo.redirects')->with('success', 'রিডাইরেক্ট আপডেট হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects আপডেট হয়েছে!');
     }
 
     public function redirectDestroy(Redirect $redirect): RedirectResponse
     {
         $redirect->delete();
-        return redirect()->route('admin.seo.redirects')->with('success', 'রিডাইরেক্ট ডিলিট করা হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects ডিলিট করা হয়েছে!');
     }
 
     public function articleSeoAnalysis(Article $article): \Illuminate\Http\JsonResponse
@@ -239,7 +238,7 @@ class SeoController extends Controller
             'label' => 'Focus Keywords',
             'value' => $article->focus_keywords ?? '—',
             'status' => !empty($article->focus_keywords) ? 'pass' : 'fail',
-            'message' => empty($article->focus_keywords) ? 'ফোকাস কীওয়ার্ড সেট করা হয়নি' : 'সেট করা আছে',
+            'message' => empty($article->focus_keywords) ? 'ফোকাস Keywords সেট করা হয়নি' : 'সেট করা আছে',
         ];
 
         $kwInTitle = false;
@@ -259,21 +258,21 @@ class SeoController extends Controller
 
         $checks[] = [
             'label' => 'Keyword in Title',
-            'value' => $kwInTitle ? 'হ্যাঁ' : 'না',
+            'value' => $kwInTitle ? 'Yes' : 'No',
             'status' => $kwInTitle ? 'pass' : 'fail',
-            'message' => $kwInTitle ? 'কীওয়ার্ড টাইটেলে আছে' : 'কীওয়ার্ড টাইটেলে নেই',
+            'message' => $kwInTitle ? 'Keywords টাইটেলে আছে' : 'Keywords টাইটেলে নেই',
         ];
 
         $checks[] = [
             'label' => 'Keyword in Body',
-            'value' => $kwInBody ? 'হ্যাঁ' : 'না',
+            'value' => $kwInBody ? 'Yes' : 'No',
             'status' => $kwInBody ? 'pass' : 'fail',
-            'message' => $kwInBody ? 'কীওয়ার্ড বডিতে আছে' : 'কীওয়ার্ড বডিতে নেই',
+            'message' => $kwInBody ? 'Keywords বডিতে আছে' : 'Keywords বডিতে নেই',
         ];
 
         $checks[] = [
             'label' => 'Indexable',
-            'value' => $article->indexable ? 'সক্রিয়' : 'নিষ্ক্রিয়',
+            'value' => $article->indexable ? 'Active' : 'Inactive',
             'status' => $article->indexable ? 'pass' : 'fail',
             'message' => $article->indexable ? 'সার্চ ইঞ্জিন ইন্ডেক্স করতে পারবে' : 'ইন্ডেক্স বন্ধ আছে',
         ];

@@ -4,7 +4,6 @@ class CustomEditor {
         this.options = Object.assign({
             height: 400,
             placeholder: '',
-            mediaLibraryUrl: null,
         }, options);
 
         this.isSource = false;
@@ -322,12 +321,33 @@ class CustomEditor {
     }
 
     showImageDialog() {
-        if (this.options.mediaLibraryUrl) {
-            this.openMediaLibrary();
-        } else {
+        if (typeof window.editorImageUploadUrl !== 'string') {
             const url = prompt('ছবির URL দিন:');
             if (url) this.insertImage(url);
+            return;
         }
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = () => {
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch(window.editorImageUploadUrl, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                body: formData,
+            })
+                .then(r => r.json())
+                .then(data => { if (data.url) this.insertImage(data.url); })
+                .catch(() => alert('ছবি আপলোড ব্যর্থ হয়েছে!'));
+        };
+
+        input.click();
     }
 
     insertImage(url) {
@@ -336,22 +356,4 @@ class CustomEditor {
         this.syncContent();
     }
 
-    openMediaLibrary() {
-        if (typeof window.openMediaLibraryForEditor === 'function') {
-            window.mediaEditorCallback = (url) => {
-                this.insertImage(url);
-                window.mediaEditorCallback = null;
-            };
-            window.openMediaLibraryForEditor();
-        }
-    }
 }
-
-// Auto-init on page load
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('[data-editor]').forEach(el => {
-        new CustomEditor(el, {
-            mediaLibraryUrl: el.dataset.mediaUrl || null,
-        });
-    });
-});

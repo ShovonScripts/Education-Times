@@ -10,14 +10,20 @@ use App\Models\District;
 use App\Models\Staff;
 use App\Enums\ArticleStatus;
 use App\Services\ArticleService;
+use App\Traits\ClearsHomepageCache;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ArticleController extends Controller
 {
+    use ClearsHomepageCache;
+
     public function __construct(private ArticleService $articleService) {}
+
     public function index(Request $request): View
     {
         $query = Article::with(['author', 'category', 'staff', 'staffs']);
@@ -45,7 +51,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('নির্ধারিত পোস্টের জন্য সময় ভবিষ্যতের হতে হবে।');
+                    $fail('Scheduled Postsের জন্য সময় ভবিষ্যতের হতে হবে।');
                 }
             };
         }
@@ -55,7 +61,7 @@ class ArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'body_bn' => 'required|string',
             'excerpt_bn' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:500',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'video_url' => 'nullable|string|max:500',
             'status' => ['required', \Illuminate\Validation\Rule::enum(ArticleStatus::class)],
             'published_at' => $publishedAtRule,
@@ -78,7 +84,13 @@ class ArticleController extends Controller
             $validated['published_at'] = $validated['published_at'] ?? now()->addHour();
         }
 
+        unset($validated['featured_image']);
+
         $article = Article::create($validated);
+
+        if ($request->hasFile('featured_image')) {
+            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
+        }
 
         if (!empty($validated['staff_ids'])) {
             $article->staffs()->sync($validated['staff_ids']);
@@ -95,6 +107,8 @@ class ArticleController extends Controller
                 ]);
             }
         }
+
+        $this->clearHomepageCache();
 
         return redirect()->route('admin.articles.index')
             ->with('success', 'আর্টিকেল তৈরি করা হয়েছে।');
@@ -114,7 +128,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('নির্ধারিত পোস্টের জন্য সময় ভবিষ্যতের হতে হবে।');
+                    $fail('Scheduled Postsের জন্য সময় ভবিষ্যতের হতে হবে।');
                 }
             };
         }
@@ -124,7 +138,7 @@ class ArticleController extends Controller
             'category_id' => 'required|exists:categories,id',
             'body_bn' => 'required|string',
             'excerpt_bn' => 'nullable|string',
-            'featured_image' => 'nullable|string|max:500',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'video_url' => 'nullable|string|max:500',
             'status' => ['required', \Illuminate\Validation\Rule::enum(ArticleStatus::class)],
             'published_at' => $publishedAtRule,
@@ -149,7 +163,17 @@ class ArticleController extends Controller
             $validated['published_at'] = now()->addHour();
         }
 
+        unset($validated['featured_image']);
+
         $article->update($validated);
+
+        if ($request->hasFile('featured_image')) {
+            $article->deleteStoredImages();
+            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
+        } elseif ($request->boolean('remove_featured_image')) {
+            $article->deleteStoredImages();
+            $article->update(['featured_image' => null]);
+        }
 
         if (isset($validated['staff_ids'])) {
             $article->staffs()->sync($validated['staff_ids']);
@@ -168,14 +192,29 @@ class ArticleController extends Controller
             }
         }
 
+        $this->clearHomepageCache();
+
         return redirect()->route('admin.articles.index')
             ->with('success', 'আর্টিকেল আপডেট করা হয়েছে।');
     }
 
     public function destroy(Article $article): RedirectResponse
     {
-        $article->delete();
+        $article->deleteStoredImages();
+        $article->forceDelete();
+        $this->clearHomepageCache();
         return redirect()->route('admin.articles.index')
             ->with('success', 'আর্টিকেল ডিলিট করা হয়েছে।');
+    }
+
+    public function editorImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+        ]);
+
+        $path = $request->file('image')->store('articles', 'public');
+
+        return response()->json(['url' => Storage::disk('public')->url($path)]);
     }
 }

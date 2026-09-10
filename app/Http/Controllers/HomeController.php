@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleTag;
 use App\Models\Category;
 use App\Models\Setting;
 use App\Models\PageView;
@@ -49,7 +50,7 @@ class HomeController extends Controller
                 ->where('id', '!=', $leadStory?->id)
                 ->with(['category', 'staffs'])
                 ->latest('published_at')
-                ->take(3)
+                ->take(4)
                 ->get();
 
             if ($stories->isEmpty()) {
@@ -57,7 +58,7 @@ class HomeController extends Controller
                     ->where('id', '!=', $leadStory?->id)
                     ->with(['category', 'staffs'])
                     ->latest('published_at')
-                    ->take(3)
+                    ->take(4)
                     ->get();
             }
             return $stories;
@@ -101,14 +102,56 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $facebookUrl = Cache::remember('social_facebook_url', 86400, function () {
-            return Setting::get('social_facebook', 'https://www.facebook.com/PENNewsBD');
+        $popularTags = Cache::remember('home_popular_tags', $cacheTtl, function () {
+            return ArticleTag::select('tag', DB::raw('COUNT(*) as count'))
+                ->groupBy('tag')
+                ->orderByDesc('count')
+                ->take(12)
+                ->get();
         });
+
+        $latest = Cache::remember('home_latest', $cacheTtl, function () {
+            return Article::where('status', ArticleStatus::PUBLISHED->value)
+                ->with(['category', 'staffs'])
+                ->latest('published_at')
+                ->take(8)
+                ->get();
+        });
+
+        $facebookUrl = Cache::remember('social_facebook_url', 86400, function () {
+            return Setting::get('social_facebook', 'https://www.facebook.com/EducationTimesBD');
+        });
+
+        $videos = Cache::remember('home_videos', $cacheTtl, function () {
+            return Article::where('status', ArticleStatus::PUBLISHED->value)
+                ->whereNotNull('video_url')
+                ->with(['category', 'staffs'])
+                ->latest('published_at')
+                ->take(6)
+                ->get();
+        });
+
+        $worldArticles = Cache::remember('home_world_articles', $cacheTtl, function () {
+            $cat = Category::where('slug', 'international')->first();
+            if (!$cat) return collect();
+            return Article::where('status', ArticleStatus::PUBLISHED->value)
+                ->where('category_id', $cat->id)
+                ->with(['category', 'staffs'])
+                ->latest('published_at')
+                ->take(5)
+                ->get();
+        });
+
+        $breakingLabel = Setting::get('hero_breaking_label', 'ব্রেকিং নিউজ');
+        $newsletterTitle = Setting::get('newsletter_title', 'নিউজলেটারে যোগ দিন');
+        $newsletterPitch = Setting::get('newsletter_pitch', 'সর্বশেষ শিক্ষা সংবাদ সরাসরি আপনার ইমেইলে পান।');
 
         return view('home', compact(
             'categories', 'leadStory', 'featuredStories',
             'breakingStories', 'mostRead', 'editorPicks',
-            'sliderArticles', 'facebookUrl'
+            'sliderArticles', 'facebookUrl', 'popularTags', 'latest',
+            'videos', 'worldArticles',
+            'breakingLabel', 'newsletterTitle', 'newsletterPitch'
         ));
     }
 }

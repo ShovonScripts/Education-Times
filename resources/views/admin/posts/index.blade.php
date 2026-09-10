@@ -1,19 +1,19 @@
 @extends('layouts.admin')
-@section('title', 'পোস্ট ম্যানেজার')
+@section('title', 'Posts Manager')
 @section('content')
 <div class="flex items-center justify-between mb-5">
     <div>
-        <h1 class="font-serif text-2xl font-bold">পোস্ট ম্যানেজার</h1>
-        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি পোস্ট</p>
+        <h1 class="font-serif text-2xl font-bold">Posts Manager</h1>
+        <p class="text-xs text-[#999] mt-0.5">{{ $articles->total() }} টি Posts</p>
     </div>
     <div class="flex items-center gap-2">
         <a href="{{ route('admin.posts.slider') }}" class="border border-[#e0e0e0] text-[#666] px-3 py-2 text-xs font-medium hover:bg-[#f5f5f5] transition flex items-center gap-1">
             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            স্লাইডার
+            Slider
         </a>
         <a href="{{ route('admin.posts.breaking') }}" class="border border-[#e0e0e0] text-[#666] px-3 py-2 text-xs font-medium hover:bg-[#f5f5f5] transition flex items-center gap-1">
             <svg class="h-3.5 w-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-            ব্রেকিং
+            Breaking
         </a>
         <a href="{{ route('admin.articles.create') }}" class="btn-primary flex items-center gap-1.5">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -25,25 +25,25 @@
 {{-- Tabs --}}
 <div class="flex gap-0.5 mb-5 text-sm flex-wrap border-b border-[#e0e0e0]">
     <a href="{{ route('admin.posts.index') }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(!request('status') && !request('flag')) border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">সব ({{ $counts['all'] }})</a>
-    <a href="{{ route('admin.posts.index', ['status' => 'published']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'published') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">প্রকাশিত ({{ $counts['published'] }})</a>
-    <a href="{{ route('admin.posts.index', ['status' => 'submitted']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'submitted') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">পর্যালোচনায় @if($counts['submitted'] > 0)<span class="ml-1 bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded">{{ $counts['submitted'] }}</span>@endif</a>
-    <a href="{{ route('admin.posts.index', ['status' => 'draft']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'draft') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">খসড়া ({{ $counts['draft'] }})</a>
-    <a href="{{ route('admin.posts.index', ['status' => 'scheduled']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'scheduled') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">নির্ধারিত ({{ $counts['scheduled'] }})</a>
+    <a href="{{ route('admin.posts.index', ['status' => 'published']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'published') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">Published ({{ $counts['published'] }})</a>
+    <a href="{{ route('admin.posts.index', ['status' => 'submitted']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'submitted') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">Pending Review @if($counts['submitted'] > 0)<span class="ml-1 bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded">{{ $counts['submitted'] }}</span>@endif</a>
+    <a href="{{ route('admin.posts.index', ['status' => 'draft']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'draft') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">Draft ({{ $counts['draft'] }})</a>
+    <a href="{{ route('admin.posts.index', ['status' => 'scheduled']) }}" class="px-4 py-2.5 font-medium transition border-b-2 @if(request('status') === 'scheduled') border-[#E02020] text-[#E02020] @else border-transparent text-[#999] hover:text-[#666] @endif">Scheduled ({{ $counts['scheduled'] }})</a>
 
 </div>
 
 {{-- Filters --}}
 <form method="GET" action="{{ route('admin.posts.index') }}" class="flex flex-wrap items-center gap-2 mb-5">
     @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
-    <input type="text" name="search" placeholder="শিরোনাম বা সারসংক্ষেপে খুঁজুন..." value="{{ request('search') }}" class="border border-[#e0e0e0] px-3 py-2 text-sm min-w-[220px] focus:outline-none focus:border-[#0d0d0d]">
+    <input type="text" name="search" placeholder="Title বা Excerptে খুঁজুন..." value="{{ request('search') }}" class="border border-[#e0e0e0] px-3 py-2 text-sm min-w-[220px] focus:outline-none focus:border-[#0d0d0d]">
     <select name="category_id" class="border border-[#e0e0e0] px-3 py-2 text-sm bg-white focus:outline-none focus:border-[#0d0d0d]">
-        <option value="">সব বিভাগ</option>
+        <option value="">সব Categories</option>
         @foreach($categories as $cat)
         <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>{{ $cat->name_bn }}</option>
         @endforeach
     </select>
     <select name="author_id" class="border border-[#e0e0e0] px-3 py-2 text-sm bg-white focus:outline-none focus:border-[#0d0d0d]">
-        <option value="">সব লেখক</option>
+        <option value="">সব Author</option>
         @foreach($authors as $author)
         <option value="{{ $author->id }}" @selected(request('author_id') == $author->id)>{{ $author->name }}</option>
         @endforeach
@@ -62,12 +62,12 @@
         <span class="text-[#666]"><span id="bulkCount">0</span> টি নির্বাচিত</span>
         <span class="text-[#ccc]">|</span>
         <button type="button" onclick="bulkAction('publish')" class="text-green-700 hover:text-green-900 text-xs font-medium">প্রকাশ</button>
-        <button type="button" onclick="bulkAction('draft')" class="text-[#666] hover:text-[#0d0d0d] text-xs font-medium">খসড়া</button>
+        <button type="button" onclick="bulkAction('draft')" class="text-[#666] hover:text-[#0d0d0d] text-xs font-medium">Draft</button>
         <button type="button" onclick="bulkAction('archive')" class="text-[#666] hover:text-[#0d0d0d] text-xs font-medium">আর্কাইভ</button>
         <span class="text-[#ccc]">|</span>
-        <button type="button" onclick="bulkAction('breaking')" class="text-red-600 hover:text-red-800 text-xs font-medium">ব্রেকিং</button>
-        <button type="button" onclick="bulkAction('featured')" class="text-yellow-600 hover:text-yellow-800 text-xs font-medium">ফিচারড</button>
-        <button type="button" onclick="bulkAction('slider')" class="text-blue-600 hover:text-blue-800 text-xs font-medium">স্লাইডার</button>
+        <button type="button" onclick="bulkAction('breaking')" class="text-red-600 hover:text-red-800 text-xs font-medium">Breaking</button>
+        <button type="button" onclick="bulkAction('featured')" class="text-yellow-600 hover:text-yellow-800 text-xs font-medium">Featured</button>
+        <button type="button" onclick="bulkAction('slider')" class="text-blue-600 hover:text-blue-800 text-xs font-medium">Slider</button>
         <span class="text-[#ccc]">|</span>
         <button type="button" onclick="if(confirm('নিশ্চিত?')) bulkAction('delete')" class="text-[#E02020] hover:text-red-700 text-xs font-medium">ডিলিট</button>
         <form id="bulkForm" method="POST" action="{{ route('admin.posts.bulk') }}" class="hidden">
@@ -86,13 +86,13 @@
                 <th class="w-10 p-3">
                     <input type="checkbox" id="selectAll" class="accent-[#E02020]">
                 </th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">পোস্ট</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">বিভাগ</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">লেখক</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">স্ট্যাটাস</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Posts</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">Categories</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">Author</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Status</th>
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden sm:table-cell">দেখা</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">তারিখ</th>
-                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">Date</th>
+                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0]">
@@ -105,7 +105,7 @@
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-[#f5f5f5] border border-[#e0e0e0] shrink-0 flex items-center justify-center text-[#ccc] text-xs overflow-hidden">
                             @if($article->featured_image)
-                            <img src="{{ $article->featured_image }}" alt="" class="w-full h-full object-cover">
+                            <img src="{{ $article->featured_image_url }}" alt="" class="w-full h-full object-cover">
                             @else
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             @endif
@@ -136,7 +136,7 @@
                             @elseif($article->status === 'submitted') text-yellow-700
                             @elseif($article->status === 'scheduled') text-blue-700
                             @else text-[#666] @endif">
-                            {{ $article->status === 'published' ? 'প্রকাশিত' : ($article->status === 'submitted' ? 'পর্যালোচনায়' : ($article->status === 'scheduled' ? 'নির্ধারিত' : 'খসড়া')) }}
+                            {{ $article->status === 'published' ? 'Published' : ($article->status === 'submitted' ? 'Pending Review' : ($article->status === 'scheduled' ? 'Scheduled' : 'Draft')) }}
                         </span>
                     </div>
                 </td>
@@ -147,13 +147,13 @@
                         <a href="{{ route('article.show', $article->slug) }}" target="_blank" class="text-[#999] hover:text-[#0d0d0d] p-1.5 transition" title="প্রিভিউ">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </a>
-                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_breaking')" class="p-1.5 transition @if($article->is_breaking) text-red-600 hover:text-red-800 @else text-[#ccc] hover:text-[#999] @endif" title="ব্রেকিং টগল">
+                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_breaking')" class="p-1.5 transition @if($article->is_breaking) text-red-600 hover:text-red-800 @else text-[#ccc] hover:text-[#999] @endif" title="Breaking টগল">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
                         </button>
-                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_featured')" class="p-1.5 transition @if($article->is_featured) text-yellow-500 hover:text-yellow-700 @else text-[#ccc] hover:text-[#999] @endif" title="ফিচারড টগল">
+                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_featured')" class="p-1.5 transition @if($article->is_featured) text-yellow-500 hover:text-yellow-700 @else text-[#ccc] hover:text-[#999] @endif" title="Featured টগল">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         </button>
-                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_slider')" class="p-1.5 transition @if($article->is_slider) text-blue-600 hover:text-blue-800 @else text-[#ccc] hover:text-[#999] @endif" title="স্লাইডার টগল">
+                        <button type="button" onclick="toggleFlag({{ $article->id }}, 'is_slider')" class="p-1.5 transition @if($article->is_slider) text-blue-600 hover:text-blue-800 @else text-[#ccc] hover:text-[#999] @endif" title="Slider টগল">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         </button>
                         <a href="{{ route('admin.articles.edit', $article) }}" class="text-[#666] hover:text-[#0d0d0d] p-1.5 transition" title="এডিট">
@@ -174,7 +174,7 @@
                     <div class="text-[#ccc] mb-2">
                         <svg class="h-10 w-10 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                     </div>
-                    <p class="text-sm text-[#999]">কোনো পোস্ট পাওয়া যায়নি</p>
+                    <p class="text-sm text-[#999]">কোনো Posts পাওয়া যায়নি</p>
                 </td>
             </tr>
             @endforelse
@@ -206,7 +206,7 @@ function updateBulkBar() {
 function bulkAction(action) {
     const checked = document.querySelectorAll('.row-checkbox:checked');
     if (checked.length === 0) return;
-    if (action === 'delete' && !confirm('{{ $articles->count() }} টি পোস্ট ডিলিট করবেন?')) return;
+    if (action === 'delete' && !confirm('{{ $articles->count() }} টি Posts ডিলিট করবেন?')) return;
     document.getElementById('bulkActionInput').value = action;
     const container = document.getElementById('bulkIds');
     container.innerHTML = '';

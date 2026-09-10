@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Contact;
+use App\Models\NewsletterSubscriber;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
                 'scheduledCount' => Article::where('status', 'scheduled')->count(),
                 'adminCount' => User::where('is_admin', true)->count(),
                 'unreadContactCount' => Schema::hasTable('contacts') ? Contact::unread()->count() : 0,
+                'subscriberCount' => Schema::hasTable('newsletter_subscribers') ? NewsletterSubscriber::active()->count() : 0,
             ]);
         });
 
@@ -40,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('socialInstagram', Setting::get('social_instagram', ''));
             $view->with('socialLinkedin', Setting::get('social_linkedin', ''));
             $view->with('socialWhatsapp', Setting::get('social_whatsapp', ''));
+            $view->with('siteFooterLogo', Setting::get('site_footer_logo', ''));
         });
     }
 }

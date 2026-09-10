@@ -79,12 +79,12 @@ class UserController extends Controller
 
         // Prevent self-demotion from admin
         if ($user->id === auth()->id() && !$validated['is_admin']) {
-            return back()->with('error', 'আপনি নিজেকে অ্যাডমিন থেকে সরাতে পারবেন না!');
+            return back()->with('error', 'আপনি নিজেকে Admins থেকে সরাতে পারবেন No!');
         }
 
         $user->update($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'ব্যবহারকারী আপডেট হয়েছে!');
+        return redirect()->route('admin.users.index')->with('success', 'Users আপডেট হয়েছে!');
     }
 
     public function create(): View
@@ -115,7 +115,7 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'নতুন ব্যবহারকারী তৈরি হয়েছে!');
+        return redirect()->route('admin.users.index')->with('success', 'নতুন Users তৈরি হয়েছে!');
     }
 
     public function toggleRole(Request $request, User $user): RedirectResponse
@@ -123,7 +123,7 @@ class UserController extends Controller
         $request->validate(['role' => 'required|in:admin,editor,user']);
 
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'আপনি নিজের রোল পরিবর্তন করতে পারবেন না!');
+            return back()->with('error', 'আপনি নিজের রোল পরিবর্তন করতে পারবেন No!');
         }
 
         $user->update([
@@ -131,32 +131,32 @@ class UserController extends Controller
             'is_editor' => in_array($request->role, ['admin', 'editor']),
         ]);
 
-        $roleLabels = ['admin' => 'অ্যাডমিন', 'editor' => 'এডিটর', 'user' => 'ব্যবহারকারী'];
+        $roleLabels = ['admin' => 'Admins', 'editor' => 'এডিটর', 'user' => 'Users'];
         return back()->with('success', "{$user->name} কে {$roleLabels[$request->role]} করা হয়েছে!");
     }
 
     public function toggleActive(User $user): RedirectResponse
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'আপনি নিজেকে নিষ্ক্রিয় করতে পারবেন না!');
+            return back()->with('error', 'আপনি নিজেকে Inactive করতে পারবেন No!');
         }
 
         $user->update(['is_active' => !$user->is_active]);
-        $status = $user->is_active ? 'সক্রিয়' : 'নিষ্ক্রিয়';
+        $status = $user->is_active ? 'Active' : 'Inactive';
         return back()->with('success', "{$user->name} কে {$status} করা হয়েছে!");
     }
 
     public function destroy(User $user): RedirectResponse
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'আপনি নিজেকে ডিলিট করতে পারবেন না!');
+            return back()->with('error', 'আপনি নিজেকে ডিলিট করতে পারবেন No!');
         }
 
         if ($user->is_admin && User::where('is_admin', true)->count() <= 1) {
-            return back()->with('error', 'শেষ অ্যাডমিনকে ডিলিট করা যাবে না!');
+            return back()->with('error', 'শেষ Adminsকে ডিলিট করা যাবে No!');
         }
 
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'ব্যবহারকারী ডিলিট করা হয়েছে!');
+        return redirect()->route('admin.users.index')->with('success', 'Users ডিলিট করা হয়েছে!');
     }
 }

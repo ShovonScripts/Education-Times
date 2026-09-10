@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
@@ -27,7 +26,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\StaffArticleController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/news/{slug}', [ArticleController::class, 'show'])->name('article.show');
 Route::get('/category/{slug}', [ArticleController::class, 'category'])->name('article.category');
 Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
+Route::get('/news', [\App\Http\Controllers\NewsController::class, 'index'])->name('news.index');
+Route::get('/videos', [\App\Http\Controllers\VideoController::class, 'index'])->name('videos.index');
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 Route::get('/staff/{staff}/articles', [StaffController::class, 'articles'])->name('staff.articles');
@@ -47,6 +50,8 @@ Route::get('/ads/impression/{ad}', [\App\Http\Controllers\Admin\AdController::cl
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms-and-conditions', [PageController::class, 'terms'])->name('pages.terms');
 
@@ -54,13 +59,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.attempt');
     Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('google.login');
     Route::get('/auth/google/callback', [SocialiteController::class, 'callback'])->name('google.callback');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminAuthController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [AdminAuthController::class, 'login'])->name('login.attempt');
+        Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('login.attempt');
     });
 });
 
@@ -73,7 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/like/{article}', [LikeController::class, 'toggle'])->name('profile.like.toggle');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/logout-admin', [AdminAuthController::class, 'logout'])->name('admin.logout');
-    Route::post('/comments', [UserCommentController::class, 'store'])->name('comments.store');
+    Route::post('/comments', [UserCommentController::class, 'store'])->middleware('throttle:10,1')->name('comments.store');
 
     Route::get('/email/verify', function () {
         return view('auth.verify-email');
@@ -119,6 +124,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/articles/{article}/edit', [AdminArticleController::class, 'edit'])->name('articles.edit');
     Route::put('/articles/{article}', [AdminArticleController::class, 'update'])->name('articles.update');
     Route::delete('/articles/{article}', [AdminArticleController::class, 'destroy'])->name('articles.destroy');
+    Route::post('/articles/editor-image', [AdminArticleController::class, 'editorImage'])->name('articles.editor-image');
 
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
@@ -160,11 +166,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/archive/{archiveDocument}', [ArchiveDocumentController::class, 'update'])->name('archive.update');
     Route::delete('/archive/{archiveDocument}', [ArchiveDocumentController::class, 'destroy'])->name('archive.destroy');
 
-    Route::get('/media', [MediaController::class, 'index'])->name('media.index');
-    Route::post('/media', [MediaController::class, 'store'])->name('media.store');
-    Route::put('/media/{medium}', [MediaController::class, 'update'])->name('media.update');
-    Route::delete('/media/{medium}', [MediaController::class, 'destroy'])->name('media.destroy');
-
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache');
@@ -192,4 +193,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/seo/redirects/{redirect}', [SeoController::class, 'redirectUpdate'])->name('seo.redirects.update');
     Route::delete('/seo/redirects/{redirect}', [SeoController::class, 'redirectDestroy'])->name('seo.redirects.destroy');
     Route::get('/seo/article/{article}/analysis', [SeoController::class, 'articleSeoAnalysis'])->name('seo.article-analysis');
+
+    Route::get('/newsletter', [NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
+    Route::post('/newsletter/{subscriber}/toggle-active', [NewsletterSubscriberController::class, 'toggleActive'])->name('newsletter.toggle-active');
+    Route::delete('/newsletter/{subscriber}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter.destroy');
 });

@@ -1,10 +1,10 @@
 @extends('layouts.admin')
-@section('title', 'যোগাযোগের বার্তা')
+@section('title', 'যোগাযোগের Messages')
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-2">
         <svg class="h-6 w-6 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        <h1 class="text-2xl font-bold">বার্তা</h1>
+        <h1 class="text-2xl font-bold">Messages</h1>
         <span class="text-xs text-[#999]">যোগাযোগ ফর্ম থেকে</span>
     </div>
     <div class="flex items-center gap-2">
@@ -19,12 +19,12 @@
     <table class="w-full text-sm">
         <thead class="admin-table-header">
             <tr>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">নাম</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Name</th>
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">বিষয়</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">ইমেইল</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">স্ট্যাটাস</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">তারিখ</th>
-                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">অ্যাকশন</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Email</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Status</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Date</th>
+                <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
@@ -45,7 +45,7 @@
                 <td class="p-3 text-[#999] text-xs">{{ $contact->created_at->diffForHumans() }}</td>
                 <td class="p-3 text-right whitespace-nowrap">
                     <a href="{{ route('admin.contacts.show', $contact) }}" class="text-xs text-[#E02020] hover:underline px-2">দেখুন</a>
-                    <form method="POST" action="{{ route('admin.contacts.destroy', $contact) }}" class="inline" onsubmit="return confirm('বার্তাটি ডিলিট করবেন?')">
+                    <form method="POST" action="{{ route('admin.contacts.destroy', $contact) }}" class="inline" onsubmit="return confirm('Messagesটি ডিলিট করবেন?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="text-xs text-red-500 hover:underline px-2">ডিলিট</button>
                     </form>
@@ -53,7 +53,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="p-10 text-center text-sm text-[#999]">কোন বার্তা নেই।</td>
+                <td colspan="6" class="p-10 text-center text-sm text-[#999]">কোন Messages নেই।</td>
             </tr>
             @endforelse
         </tbody>

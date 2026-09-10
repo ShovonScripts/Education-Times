@@ -45,7 +45,7 @@ class CategoryController extends Controller
         Category::create($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'বিভাগ তৈরি করা হয়েছে।');
+            ->with('success', 'Categories তৈরি করা হয়েছে।');
     }
 
     public function edit(Category $category): View
@@ -70,19 +70,19 @@ class CategoryController extends Controller
         $category->update($validated);
 
         return redirect()->route('admin.categories.index')
-            ->with('success', 'বিভাগ আপডেট করা হয়েছে।');
+            ->with('success', 'Categories আপডেট করা হয়েছে।');
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         if ($category->articles()->exists()) {
-            return back()->withErrors(['error' => 'এই বিভাগে আর্টিকেল আছে, প্রথমে সরান।']);
+            return back()->withErrors(['error' => 'এই Categoriesে আর্টিকেল আছে, প্রথমে সরান।']);
         }
         if ($category->isParent()) {
-            return back()->withErrors(['error' => 'এই বিভাগের উপ-বিভাগ আছে, প্রথমে সরান।']);
+            return back()->withErrors(['error' => 'এই Categoriesের উপ-Categories আছে, প্রথমে সরান।']);
         }
         $category->delete();
         return redirect()->route('admin.categories.index')
-            ->with('success', 'বিভাগ ডিলিট করা হয়েছে।');
+            ->with('success', 'Categories ডিলিট করা হয়েছে।');
     }
 }

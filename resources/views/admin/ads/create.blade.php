@@ -3,18 +3,18 @@
 <div class="mb-6">
     <a href="{{ route('admin.ads.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition flex items-center gap-1">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        ফিরে যান
+        Go Back
     </a>
 </div>
 <div class="flex items-center gap-2 mb-6">
     <svg class="h-5 w-5 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    <h1 class="text-2xl font-bold">নতুন বিজ্ঞাপন</h1>
+    <h1 class="text-2xl font-bold">নতুন Ads</h1>
 </div>
 <div class="admin-card p-6 max-w-lg">
     <form method="POST" action="{{ route('admin.ads.store') }}" class="space-y-4">
         @csrf
         <div>
-            <label class="block text-xs font-medium text-[#666] mb-1">শিরোনাম *</label>
+            <label class="block text-xs font-medium text-[#666] mb-1">Title *</label>
             <input type="text" name="title" value="{{ old('title') }}" required class="admin-input w-full">
         </div>
         <div>
@@ -35,17 +35,17 @@
         <div>
             <label class="block text-xs font-medium text-[#666] mb-1">টাইপ *</label>
             <select name="type" id="adType" required class="admin-select w-full">
-                <option value="banner" @selected(old('type') === 'banner')>ব্যানার (ছবি)</option>
+                <option value="banner" @selected(old('type') === 'banner')>ব্যাNoর (Image)</option>
                 <option value="code" @selected(old('type') === 'code')>কোড (HTML/JavaScript)</option>
             </select>
         </div>
         <div id="bannerFields">
             <div>
-                <label class="block text-xs font-medium text-[#666] mb-1">ছবির URL *</label>
+                <label class="block text-xs font-medium text-[#666] mb-1">Imageর URL *</label>
                 <input type="url" name="image_url" value="{{ old('image_url') }}" class="admin-input w-full" placeholder="https://example.com/ad-banner.jpg">
             </div>
             <div>
-                <label class="block text-xs font-medium text-[#666] mb-1">লিংক URL</label>
+                <label class="block text-xs font-medium text-[#666] mb-1">Link URL</label>
                 <input type="url" name="link_url" value="{{ old('link_url') }}" class="admin-input w-full" placeholder="https://example.com">
             </div>
         </div>
@@ -65,11 +65,11 @@
         </div>
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-medium text-[#666] mb-1">শুরুর তারিখ</label>
+                <label class="block text-xs font-medium text-[#666] mb-1">শুরুর Date</label>
                 <input type="date" name="starts_at" value="{{ old('starts_at') }}" class="admin-input w-full">
             </div>
             <div>
-                <label class="block text-xs font-medium text-[#666] mb-1">শেষের তারিখ</label>
+                <label class="block text-xs font-medium text-[#666] mb-1">শেষের Date</label>
                 <input type="date" name="ends_at" value="{{ old('ends_at') }}" class="admin-input w-full">
             </div>
         </div>
@@ -81,7 +81,7 @@
             <label class="flex items-center gap-2 text-sm">
                 <input type="hidden" name="is_active" value="0">
                 <input type="checkbox" name="is_active" value="1" checked class="h-4 w-4 accent-[#0d0d0d]">
-                <span>সক্রিয়</span>
+                <span>Active</span>
             </label>
         </div>
         <div class="pt-2">
@@ -92,10 +92,10 @@
 @push('scripts')
 <script>
 const sizeInfo = {
-    header: { label: 'লিডারবোর্ড', desc: 'ওয়াইড ব্যানার — হেডারের নিচে পুরো প্রস্থে দেখায়' },
-    sidebar: { label: 'মিডিয়াম রেক্ট্যাঙ্গেল / স্কাইস্ক্র্যাপার', desc: 'সাইডবার কলামের ভিতরে ফিট করতে হবে' },
-    article_top: { label: 'লিডারবোর্ড / ব্যানার', desc: 'আর্টিকেলের ফিচার্ড ইমেজ ও বডির মাঝে' },
-    article_bottom: { label: 'লিডারবোর্ড / ব্যানার', desc: 'আর্টিকেল বডির পরে, ট্যাগসের আগে' },
+    header: { label: 'লিডারবোর্ড', desc: 'ওয়াইড ব্যাNoর — হেডারের নিচে পুরো প্রস্থে দেখায়' },
+    sidebar: { label: 'Mediaম রেক্ট্যাঙ্গেল / স্কাইস্ক্র্যাপার', desc: 'সাইডবার কলামের ভিতরে ফিট করতে হবে' },
+    article_top: { label: 'লিডারবোর্ড / ব্যাNoর', desc: 'আর্টিকেলের ফিচার্ড ইমেজ ও বডির মাঝে' },
+    article_bottom: { label: 'লিডারবোর্ড / ব্যাNoর', desc: 'আর্টিকেল বডির পরে, Tagsসের আগে' },
     footer: { label: 'লিডারবোর্ড / সুপার লিডারবোর্ড', desc: 'ফুটারের উপরে পুরো প্রস্থে' },
     popup: { label: 'রেসপন্সিভ মডাল', desc: 'পপআপ উইন্ডোর ভিতরে — মোবাইলেও ফিট হবে এমন সাইজ' },
 };

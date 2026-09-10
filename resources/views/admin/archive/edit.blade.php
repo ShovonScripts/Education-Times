@@ -1,20 +1,20 @@
 @extends('layouts.admin')
 @section('content')
-<div class="mb-6"><a href="{{ route('admin.archive.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition"><span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> ফিরে যান</span></a></div>
-<h1 class="font-serif text-2xl font-bold mb-6">নথি এডিট</h1>
+<div class="mb-6"><a href="{{ route('admin.archive.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition"><span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> Go Back</span></a></div>
+<h1 class="font-serif text-2xl font-bold mb-6">Archives এডিট</h1>
 <div class="bg-white dark:bg-[#1e1e1e] border border-[#e0e0e0] p-6 max-w-2xl">
     <form method="POST" action="{{ route('admin.archive.update', $archiveDocument) }}" class="space-y-4">
         @csrf @method('PUT')
-        <div><label class="block text-sm font-medium text-[#666] mb-1">শিরোনাম (বাংলা) *</label><input type="text" name="title_bn" value="{{ old('title_bn', $archiveDocument->title_bn) }}" required class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
-        <div><label class="block text-sm font-medium text-[#666] mb-1">শিরোনাম (English)</label><input type="text" name="title_en" value="{{ old('title_en', $archiveDocument->title_en) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
-        <div><label class="block text-sm font-medium text-[#666] mb-1">বিবরণ</label><textarea name="description_bn" rows="3" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">{{ old('description_bn', $archiveDocument->description_bn) }}</textarea></div>
-        <div><label class="block text-sm font-medium text-[#666] mb-1">ফাইল পাথ *</label><input type="text" name="file_path" value="{{ old('file_path', $archiveDocument->file_path) }}" required class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
+        <div><label class="block text-sm font-medium text-[#666] mb-1">Title (বাংলা) *</label><input type="text" name="title_bn" value="{{ old('title_bn', $archiveDocument->title_bn) }}" required class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
+        <div><label class="block text-sm font-medium text-[#666] mb-1">Title (English)</label><input type="text" name="title_en" value="{{ old('title_en', $archiveDocument->title_en) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
+        <div><label class="block text-sm font-medium text-[#666] mb-1">Description</label><textarea name="description_bn" rows="3" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">{{ old('description_bn', $archiveDocument->description_bn) }}</textarea></div>
+        <div><label class="block text-sm font-medium text-[#666] mb-1">File পাথ *</label><input type="text" name="file_path" value="{{ old('file_path', $archiveDocument->file_path) }}" required class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
         <div class="grid grid-cols-3 gap-4">
             <div><label class="block text-sm font-medium text-[#666] mb-1">সাল</label><select name="year" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-[#0d0d0d]"><option value="">—</option>@foreach($years as $y)<option value="{{ $y }}" @selected($archiveDocument->year == $y)>{{ $y }}</option>@endforeach</select></div>
             <div><label class="block text-sm font-medium text-[#666] mb-1">বিষয়</label><input type="text" name="subcategory" value="{{ old('subcategory', $archiveDocument->subcategory) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
-            <div><label class="block text-sm font-medium text-[#666] mb-1">ফাইলের ধরন</label><input type="text" name="file_type" value="{{ old('file_type', $archiveDocument->file_type) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
+            <div><label class="block text-sm font-medium text-[#666] mb-1">Fileের ধরন</label><input type="text" name="file_type" value="{{ old('file_type', $archiveDocument->file_type) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
         </div>
-        <div><label class="block text-sm font-medium text-[#666] mb-1">ফাইলের সাইজ (bytes)</label><input type="number" name="file_size" value="{{ old('file_size', $archiveDocument->file_size) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
+        <div><label class="block text-sm font-medium text-[#666] mb-1">Fileের সাইজ (bytes)</label><input type="number" name="file_size" value="{{ old('file_size', $archiveDocument->file_size) }}" class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]"></div>
         <div class="pt-2"><button type="submit" class="bg-[#E02020] text-white px-6 py-2.5 text-sm font-medium hover:bg-red-700 transition">আপডেট</button></div>
     </form>
 </div>

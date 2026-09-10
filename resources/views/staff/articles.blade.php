@@ -44,7 +44,7 @@
                         @if($article->has_video)
                         @include('partials.youtube-embed', ['videoUrl' => $article->video_url, 'mode' => 'thumb'])
                         @elseif($article->featured_image)
-                        <img src="{{ $article->featured_image }}" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                        <img src="{{ $article->featured_image_url }}" alt="" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                         @endif
                     </div>
                     <div class="p-3 {{ $loop->first ? 'flex flex-col justify-center' : '' }}">

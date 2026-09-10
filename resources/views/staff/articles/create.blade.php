@@ -9,7 +9,7 @@
 </div>
 <h1 class="font-serif text-2xl font-bold mb-6 dark:text-white">নতুন আর্টিকেল</h1>
 <div class="bg-white dark:bg-[#1e1e1e] border border-[#e0e0e0] dark:border-[#333] p-6 md:p-8">
-    <form method="POST" action="{{ route('staff.articles.store') }}" class="space-y-4">
+    <form method="POST" action="{{ route('staff.articles.store') }}" enctype="multipart/form-data" class="space-y-4">
         @csrf
         <div>
             <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">শিরোনাম (বাংলা) *</label>
@@ -37,9 +37,18 @@
             <p class="text-xs text-[#999] dark:text-[#777] mt-1">HTML ট্যাগ ব্যবহার করা যাবে</p>
         </div>
         <div>
-            <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">ফিচারড ইমেজ URL</label>
-            <input type="text" name="featured_image" value="{{ old('featured_image') }}"
-                class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d]">
+            <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">ফিচার্ড ইমেজ (JPEG/PNG/WebP)</label>
+            <input type="file" name="featured_image" accept="image/*"
+                class="w-full border border-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] file:mr-3 file:border-0 file:bg-[#f5f5f5] file:px-3 file:py-1.5 file:text-xs file:font-medium">
+            @if(isset($article) && $article->featured_image_url)
+            <div class="mt-2 flex items-center gap-3">
+                <img src="{{ $article->featured_image_url }}" alt="" class="w-24 h-16 object-cover border border-[#e0e0e0]">
+                <label class="flex items-center gap-2 text-xs text-[#999] cursor-pointer">
+                    <input type="checkbox" name="remove_featured_image" value="1" class="accent-[#E02020]"> বর্তমান ছবি সরান
+                </label>
+            </div>
+            @endif
+            <p class="text-xs text-[#999] mt-1">নতুন ছবি দিলে আগেরটি স্বয়ংক্রিয়ভাবে মুছে যাবে।</p>
         </div>
         <div>
             <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">ইউটিউব ভিডিও লিংক</label>

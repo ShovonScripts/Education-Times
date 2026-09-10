@@ -1,72 +1,50 @@
 @extends('layouts.guest')
-
-@section('title', 'লগইন - ' . config('app.name'))
-
+@section('title', 'লগইন — ' . config('app.name'))
 @section('content')
-<div class="min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-sm">
-        <div class="text-center mb-8">
-            <a href="/" class="font-serif font-bold text-4xl text-[#0d0d0d] dark:text-white">PEN</a>
-            <p class="text-[#666] dark:text-[#999] text-sm mt-1">প্রাথমিক শিক্ষা নিউজ</p>
-        </div>
+<div class="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md">
+        <a href="/" class="block text-center mb-6">
+            <span class="font-serif font-black text-3xl text-[#111]">Education Times</span>
+            <span class="block text-[10px] tracking-[0.3em] text-[#666] uppercase mt-1">এডুকেশন টাইমস</span>
+        </a>
 
-        <div class="bg-white dark:bg-[#1e1e1e] rounded-sm shadow-sm border border-[#e0e0e0] dark:border-[#333] p-8">
-            <h1 class="text-2xl font-bold mb-6 dark:text-white">লগইন</h1>
+        <div class="bg-white border border-[#e5e5e5] p-8">
+            <h1 class="font-serif font-black text-2xl text-[#111] mb-1">লগইন</h1>
+            <p class="text-sm text-[#666] mb-6">আপনার অ্যাকাউন্টে প্রবেশ করুন</p>
 
-            @if (session('success'))
-                <div class="bg-green-50 dark:bg-green-950/20 border-l-4 border-green-600 p-4 mb-6 text-sm text-green-800 dark:text-green-400">{{ session('success') }}</div>
-            @endif
-
-            @if ($errors->any())
-                <div class="bg-red-50 dark:bg-red-950/20 border-l-4 border-[#E02020] p-4 mb-6">
-                    <ul class="text-sm text-[#E02020] dark:text-red-400 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            @if(session('status'))
+            <div class="mb-4 border-l-4 border-[#111] bg-[#f5f5f5] px-4 py-3 text-sm">{{ session('status') }}</div>
             @endif
 
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">ইমেইল</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                        class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#2a2a2a] dark:text-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-[#888] transition">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-[#111] mb-1.5">ইমেইল</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required autofocus class="w-full border border-[#e5e5e5] focus:border-[#111] focus:outline-none focus:ring-1 focus:ring-[#111] px-3 py-2.5 text-sm">
+                    @error('email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#999] mb-1">পাসওয়ার্ড</label>
-                    <input type="password" name="password" required
-                        class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#2a2a2a] dark:text-[#e0e0e0] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-[#888] transition">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-[#111] mb-1.5">পাসওয়ার্ড</label>
+                    <input type="password" name="password" required class="w-full border border-[#e5e5e5] focus:border-[#111] focus:outline-none focus:ring-1 focus:ring-[#111] px-3 py-2.5 text-sm">
+                    @error('password') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="flex items-center justify-between">
-                    <label class="flex items-center gap-2 text-sm text-[#666] dark:text-[#999]">
-                        <input type="checkbox" name="remember" class="border-[#e0e0e0] dark:border-[#444] dark:bg-[#2a2a2a]">
+                    <label class="flex items-center gap-2 text-sm text-[#444]">
+                        <input type="checkbox" name="remember" class="border-[#111] text-[#111] focus:ring-[#111]">
                         মনে রাখুন
                     </label>
+                    @if(Route::has('password.request'))
+                    <a href="{{ route('password.request') }}" class="text-sm text-[#111] hover:underline">পাসওয়ার্ড ভুলে গেছেন?</a>
+                    @endif
                 </div>
-                <button type="submit"
-                    class="w-full bg-[#0d0d0d] dark:bg-[#333] text-white py-3 font-medium hover:bg-black/80 dark:hover:bg-[#444] transition text-sm">
-                    লগইন
-                </button>
+                <button type="submit" class="w-full bg-[#111] hover:bg-black text-white text-sm font-semibold uppercase tracking-wider py-3 transition">লগইন</button>
             </form>
 
-            <div class="mt-6">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-[#e0e0e0] dark:border-[#333]"></div></div>
-                    <div class="relative flex justify-center text-xs text-[#666] dark:text-[#999]"><span class="bg-white dark:bg-[#1e1e1e] px-2">অথবা</span></div>
-                </div>
-                <a href="{{ route('google.login') }}"
-                    class="mt-4 w-full flex items-center justify-center gap-2 border border-[#e0e0e0] dark:border-[#444] py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition dark:text-[#e0e0e0]">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    Google দিয়ে লগইন
-                </a>
-            </div>
-
-            <p class="text-center text-sm text-[#666] dark:text-[#999] mt-6">
-                একাউন্ট নেই?
-                <a href="{{ route('register') }}" class="text-[#E02020] hover:underline">নিবন্ধন করুন</a>
+            @if(Route::has('register'))
+            <p class="text-sm text-center text-[#666] mt-5 pt-5 border-t border-[#e5e5e5]">
+                অ্যাকাউন্ট নেই? <a href="{{ route('register') }}" class="text-[#111] font-semibold hover:underline">রেজিস্টার করুন</a>
             </p>
+            @endif
         </div>
     </div>
 </div>
