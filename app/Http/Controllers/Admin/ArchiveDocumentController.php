@@ -43,7 +43,7 @@ class ArchiveDocumentController extends Controller
         ArchiveDocument::create($validated);
 
         return redirect()->route('admin.archive.index')
-            ->with('success', 'Archives যোগ করা হয়েছে।');
+            ->with('success', 'Archive document added successfully.');
     }
 
     public function edit(ArchiveDocument $archiveDocument): View
@@ -68,13 +68,13 @@ class ArchiveDocumentController extends Controller
         $archiveDocument->update($validated);
 
         return redirect()->route('admin.archive.index')
-            ->with('success', 'Archives আপডেট করা হয়েছে।');
+            ->with('success', 'Archive document updated successfully.');
     }
 
     public function destroy(ArchiveDocument $archiveDocument): RedirectResponse
     {
         $archiveDocument->delete();
         return redirect()->route('admin.archive.index')
-            ->with('success', 'Archives ডিলিট করা হয়েছে।');
+            ->with('success', 'Archive document deleted successfully.');
     }
 }

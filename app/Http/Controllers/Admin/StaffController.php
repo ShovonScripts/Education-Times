@@ -43,7 +43,7 @@ class StaffController extends Controller
         Staff::create($validated);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'Staff যোগ করা হয়েছে।');
+            ->with('success', 'Staff member added successfully.');
     }
 
     public function edit(Staff $staff): View
@@ -73,13 +73,13 @@ class StaffController extends Controller
         $staff->update($validated);
 
         return redirect()->route('admin.staff.index')
-            ->with('success', 'Staff আপডেট করা হয়েছে।');
+            ->with('success', 'Staff member updated successfully.');
     }
 
     public function destroy(Staff $staff): RedirectResponse
     {
         $staff->delete();
         return redirect()->route('admin.staff.index')
-            ->with('success', 'Staff ডিলিট করা হয়েছে।');
+            ->with('success', 'Staff member deleted successfully.');
     }
 }

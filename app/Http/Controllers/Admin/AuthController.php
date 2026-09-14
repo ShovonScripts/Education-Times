@@ -32,13 +32,13 @@ class AuthController extends Controller
             if (!Auth::user()->is_admin) {
                 Auth::logout();
                 $request->session()->invalidate();
-                return back()->withErrors(['email' => 'এই একাউন্টে এডমিন অনুমতি নেই।']);
+                return back()->withErrors(['email' => 'This account does not have admin access.']);
             }
 
             if (Auth::user()->is_active === false) {
                 Auth::logout();
                 $request->session()->invalidate();
-                return back()->withErrors(['email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।']);
+                return back()->withErrors(['email' => 'Your account has been deactivated.']);
             }
 
             $request->session()->regenerate();
@@ -46,7 +46,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Email বা Password ভুল।',
+            'email' => 'These credentials do not match our records.',
         ])->onlyInput('email');
     }
 

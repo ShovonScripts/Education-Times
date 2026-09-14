@@ -21,18 +21,18 @@ class CommentController extends Controller
     public function approve(Comment $comment): RedirectResponse
     {
         $comment->update(['status' => 'approved']);
-        return back()->with('success', 'Comments অনুমোদিত হয়েছে।');
+        return back()->with('success', 'Comment approved.');
     }
 
     public function reject(Comment $comment): RedirectResponse
     {
         $comment->update(['status' => 'rejected']);
-        return back()->with('success', 'Comments প্রত্যাখ্যান করা হয়েছে।');
+        return back()->with('success', 'Comment rejected.');
     }
 
     public function destroy(Comment $comment): RedirectResponse
     {
         $comment->delete();
-        return back()->with('success', 'Comments ডিলিট করা হয়েছে।');
+        return back()->with('success', 'Comment deleted successfully.');
     }
 }

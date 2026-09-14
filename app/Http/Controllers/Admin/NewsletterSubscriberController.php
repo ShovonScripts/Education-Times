@@ -46,12 +46,12 @@ class NewsletterSubscriberController extends Controller
             'unsubscribed_at' => $newState ? null : now(),
         ]);
 
-        return back()->with('success', $newState ? 'সাবস্ক্রাইবার Active করা হয়েছে।' : 'সাবস্ক্রাইবার Inactive করা হয়েছে।');
+        return back()->with('success', $newState ? 'Subscriber activated.' : 'Subscriber deactivated.');
     }
 
     public function destroy(NewsletterSubscriber $subscriber): RedirectResponse
     {
         $subscriber->delete();
-        return back()->with('success', 'সাবস্ক্রাইবার ডিলিট করা হয়েছে।');
+        return back()->with('success', 'Subscriber deleted successfully.');
     }
 }

@@ -51,7 +51,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('শিডিউল পোস্টের প্রকাশের সময় ভবিষ্যতের হতে হবে।');
+                    $fail('The scheduled publish time must be in the future.');
                 }
             };
         }
@@ -96,7 +96,7 @@ class ArticleController extends Controller
         $this->clearHomepageCache();
 
         return redirect()->route('admin.articles.index')
-            ->with('success', 'আর্টিকেল তৈরি করা হয়েছে।');
+            ->with('success', 'Article created successfully.');
     }
 
     public function edit(Article $article): View
@@ -113,7 +113,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('শিডিউল পোস্টের প্রকাশের সময় ভবিষ্যতের হতে হবে।');
+                    $fail('The scheduled publish time must be in the future.');
                 }
             };
         }
@@ -164,7 +164,7 @@ class ArticleController extends Controller
         $this->clearHomepageCache();
 
         return redirect()->route('admin.articles.index')
-            ->with('success', 'আর্টিকেল আপডেট করা হয়েছে।');
+            ->with('success', 'Article updated successfully.');
     }
 
     public function destroy(Article $article): RedirectResponse
@@ -173,7 +173,7 @@ class ArticleController extends Controller
         $article->forceDelete();
         $this->clearHomepageCache();
         return redirect()->route('admin.articles.index')
-            ->with('success', 'আর্টিকেল ডিলিট করা হয়েছে।');
+            ->with('success', 'Article deleted successfully.');
     }
 
     public function editorImage(Request $request): JsonResponse

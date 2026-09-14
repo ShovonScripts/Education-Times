@@ -13,7 +13,7 @@
         <thead>
             <tr class="admin-table-header">
                 <th class="text-left">Pages</th>
-                <th class="text-left">স্লাগ</th>
+                <th class="text-left">Slug</th>
                 <th class="text-right">Action</th>
             </tr>
         </thead>
@@ -26,7 +26,7 @@
                 </td>
                 <td class="px-6 py-4 text-sm text-[#999]">{{ $page['slug'] }}</td>
                 <td class="px-6 py-4 text-right">
-                    <a href="{{ route('admin.pages.edit', $page['slug']) }}" class="btn-secondary text-xs px-3 py-1.5">এডিট</a>
+                    <a href="{{ route('admin.pages.edit', $page['slug']) }}" class="btn-secondary text-xs px-3 py-1.5">Edit</a>
                 </td>
             </tr>
             @endforeach

@@ -7,7 +7,7 @@
             <svg class="h-6 w-6 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <h1 class="text-2xl font-bold">SEO Manager</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $total }} টি Posts, {{ $published }} টি Published</p>
+        <p class="text-xs text-[#999] mt-0.5">{{ $total }} Posts, {{ $published }} Published</p>
     </div>
     <div class="flex items-center gap-2">
         <a href="{{ route('admin.seo.bulk-editor') }}" class="border border-[#e0e0e0] dark:border-[#444] text-[#666] dark:text-[#aaa] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition flex items-center gap-1">
@@ -33,15 +33,15 @@
     <div class="flex items-center gap-6 flex-wrap">
         <div class="text-center">
             <div class="text-4xl font-bold {{ $score >= 80 ? 'text-green-600' : ($score >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $score }}%</div>
-            <div class="text-xs text-[#999] mt-1">SEO স্কোর</div>
+            <div class="text-xs text-[#999] mt-1">SEO Score</div>
         </div>
         <div class="flex-1 min-w-[200px]">
             <div class="h-2 bg-[#f0f0f0] dark:bg-[#333] rounded-full overflow-hidden">
                 <div class="h-full rounded-full transition-all {{ $score >= 80 ? 'bg-green-500' : ($score >= 50 ? 'bg-yellow-500' : 'bg-red-500') }}" style="width: {{ $score }}%"></div>
             </div>
             <div class="flex justify-between text-xs text-[#999] mt-1">
-                <span>{{ $total - $issues[0]['count'] }} টি মেটা টাইটেল আছে</span>
-                <span>{{ $total - $issues[1]['count'] }} টি মেটা ডেসক্রিপশন আছে</span>
+                <span>{{ $total - $issues[0]['count'] }} have Meta Title</span>
+                <span>{{ $total - $issues[1]['count'] }} have Meta Description</span>
             </div>
         </div>
     </div>
@@ -68,22 +68,22 @@
     <a href="{{ route('admin.seo.bulk-editor', ['seo_issue' => 'no_meta_title']) }}" class="admin-card p-4 admin-hover-row transition flex items-center gap-3">
         <svg class="h-8 w-8 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2M7 4h10M7 4H4a1 1 0 00-1 1v2a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3"/></svg>
         <div>
-            <p class="text-sm font-medium">মেটা টাইটেলহীন Posts</p>
-            <p class="text-xs text-[#999]">{{ $issues[0]['count'] }} টি Posts — এখনই ঠিক করুন</p>
+            <p class="text-sm font-medium">Posts without Meta Title</p>
+            <p class="text-xs text-[#999]">{{ $issues[0]['count'] }} Posts — Fix now</p>
         </div>
     </a>
     <a href="{{ route('admin.seo.bulk-editor', ['seo_issue' => 'no_meta_desc']) }}" class="admin-card p-4 admin-hover-row transition flex items-center gap-3">
         <svg class="h-8 w-8 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         <div>
-            <p class="text-sm font-medium">ডেসক্রিপশনহীন Posts</p>
-            <p class="text-xs text-[#999]">{{ $issues[1]['count'] }} টি Posts — এখনই ঠিক করুন</p>
+            <p class="text-sm font-medium">Posts without Description</p>
+            <p class="text-xs text-[#999]">{{ $issues[1]['count'] }} Posts — Fix now</p>
         </div>
     </a>
     <a href="{{ route('admin.seo.bulk-editor', ['seo_issue' => 'no_keywords']) }}" class="admin-card p-4 admin-hover-row transition flex items-center gap-3">
         <svg class="h-8 w-8 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
         <div>
-            <p class="text-sm font-medium">Keywordsহীন Posts</p>
-            <p class="text-xs text-[#999]">{{ $issues[3]['count'] }} টি Posts — এখনই Add</p>
+            <p class="text-sm font-medium">Posts without Keywords</p>
+            <p class="text-xs text-[#999]">{{ $issues[3]['count'] }} Posts — Add now</p>
         </div>
     </a>
 </div>
@@ -93,11 +93,11 @@
         <svg class="h-5 w-5 text-[#999]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         <div>
             <p class="text-sm font-medium">301 Redirects</p>
-            <p class="text-xs text-[#999]">{{ $activeRedirects }} টি Active / {{ $redirects }} টি মোট</p>
+            <p class="text-xs text-[#999]">{{ $activeRedirects }} Active / {{ $redirects }} Total</p>
         </div>
     </div>
     <a href="{{ route('admin.seo.redirects') }}" class="text-xs text-[#E02020] hover:text-red-700 font-medium flex items-center gap-1">
-        Manage করুন
+        Manage
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
     </a>
 </div>

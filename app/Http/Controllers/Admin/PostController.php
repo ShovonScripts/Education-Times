@@ -145,11 +145,11 @@ class PostController extends Controller
             return response()->json([
                 'success' => true,
                 'state' => $article->$field,
-                'label' => $field === 'is_breaking' ? 'Breaking' : ($field === 'is_featured' ? 'Featured' : ($field === 'is_slider' ? 'Slider' : 'এডিটরস পিক')),
+                'label' => $field === 'is_breaking' ? 'Breaking' : ($field === 'is_featured' ? 'Featured' : ($field === 'is_slider' ? 'Slider' : "Editor's Pick")),
             ]);
         }
 
-        return back()->with('success', 'ফ্লাগ আপডেট হয়েছে!');
+        return back()->with('success', 'Flag updated!');
     }
 
     public function updateStatus(Request $request, Article $article): RedirectResponse
@@ -165,8 +165,8 @@ class PostController extends Controller
 
         $this->clearHomepageCache();
 
-        $labels = ['published' => 'Published', 'draft' => 'Draft', 'submitted' => 'Pending Review', 'archived' => 'আর্কাইভ'];
-        return back()->with('success', "অবস্থা '{$labels[$request->status]}' এ পরিবর্তন করা হয়েছে!");
+        $labels = ['published' => 'Published', 'draft' => 'Draft', 'submitted' => 'Pending Review', 'archived' => 'Archived'];
+        return back()->with('success', "Status changed to '{$labels[$request->status]}'!");
     }
 
     public function updateSliderOrder(Request $request): JsonResponse
@@ -217,6 +217,6 @@ class PostController extends Controller
 
         $this->clearHomepageCache();
 
-        return back()->with('success', 'বাল্ক কার্যক্রম সম্পন্ন হয়েছে!');
+        return back()->with('success', 'Bulk action completed!');
     }
 }

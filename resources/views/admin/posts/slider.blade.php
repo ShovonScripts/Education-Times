@@ -7,11 +7,11 @@
             <svg class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             <h1 class="text-2xl font-bold">Slider Manager</h1>
         </div>
-        <p class="text-xs text-[#999] mt-0.5">{{ $articles->count() }} টি Slider Posts</p>
+        <p class="text-xs text-[#999] mt-0.5">{{ $articles->count() }} Slider Posts</p>
     </div>
     <a href="{{ route('admin.posts.index') }}" class="border border-[#e0e0e0] text-[#666] px-4 py-2 text-xs font-medium hover:bg-[#f5f5f5] transition flex items-center gap-1">
         <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        সব Posts
+        All Posts
     </a>
 </div>
 
@@ -19,8 +19,8 @@
     <div class="lg:col-span-2">
         <div class="admin-card">
             <div class="px-5 py-3 border-b border-[#e0e0e0] dark:border-[#333] flex items-center justify-between">
-                <h2 class="text-sm font-bold">Slider Postsসমূহ</h2>
-                <span class="text-xs text-[#999]">ড্র্যাগ করে অর্ডার Change</span>
+                <h2 class="text-sm font-bold">Slider Posts</h2>
+                <span class="text-xs text-[#999]">Drag to reorder</span>
             </div>
             <div id="sliderList" class="divide-y divide-[#e0e0e0] dark:divide-[#333]">
                 @forelse($articles as $article)
@@ -40,28 +40,28 @@
                         <p class="text-xs text-[#999]">{{ $article->category?->name_bn }} — {{ $article->published_at?->format('d/m/Y') }}</p>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button type="button" onclick="removeFromSlider({{ $article->id }})" class="text-xs text-[#999] hover:text-[#E02020] transition px-2 py-1 border border-[#e0e0e0] dark:border-[#444] hover:border-red-300" title="Slider থেকে সরান">
+                        <button type="button" onclick="removeFromSlider({{ $article->id }})" class="text-xs text-[#999] hover:text-[#E02020] transition px-2 py-1 border border-[#e0e0e0] dark:border-[#444] hover:border-red-300" title="Remove from Slider">
                             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
                 @empty
                 <div class="p-10 text-center text-sm text-[#999]">
-                    <p class="mb-1">কোনো Slider Posts নেই</p>
-                    <p class="text-xs">নিচের তালিকা থেকে Posts Slider হিসেবে যুক্ত করুন</p>
+                    <p class="mb-1">No Slider Posts</p>
+                    <p class="text-xs">Add Posts from the list below to the Slider</p>
                 </div>
                 @endforelse
             </div>
         </div>
         <div class="mt-4 text-right">
-            <button type="button" onclick="saveSliderOrder()" class="btn-primary" id="saveOrderBtn" style="display:none">অর্ডার Save</button>
+            <button type="button" onclick="saveSliderOrder()" class="btn-primary" id="saveOrderBtn" style="display:none">Save Order</button>
         </div>
     </div>
 
     <div>
         <div class="admin-card">
             <div class="px-5 py-3 border-b border-[#e0e0e0] dark:border-[#333]">
-                <h2 class="text-sm font-bold">Posts যুক্ত করুন</h2>
+                <h2 class="text-sm font-bold">Add Posts</h2>
             </div>
             <div class="divide-y divide-[#e0e0e0] dark:divide-[#333] max-h-[600px] overflow-y-auto">
                 @forelse($available as $article)
@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="p-6 text-center text-sm text-[#999]">সব পাবলিশড Posts ইতিমধ্যে Sliderে আছে</div>
+                <div class="p-6 text-center text-sm text-[#999]">All Published Posts are already in the Slider</div>
                 @endforelse
             </div>
         </div>
@@ -146,7 +146,7 @@ function saveSliderOrder() {
 }
 
 function addToSlider(id) { toggleArticleFlag(id, 'is_slider'); }
-function removeFromSlider(id) { if (confirm('Slider থেকে সরাবেন?')) toggleArticleFlag(id, 'is_slider'); }
+function removeFromSlider(id) { if (confirm('Remove from Slider?')) toggleArticleFlag(id, 'is_slider'); }
 function toggleArticleFlag(id, flag) {
     fetch('{{ route("admin.posts.toggle-flag", ["article" => 0]) }}'.replace('/0', '/' + id), {
         method: 'POST',

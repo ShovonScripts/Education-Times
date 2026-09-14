@@ -51,13 +51,13 @@ class SeoController extends Controller
         $activeRedirects = Redirect::where('is_active', true)->count();
 
         $issues = [
-            ['label' => 'মেটা টাইটেল নেই', 'count' => $noMetaTitle, 'icon' => 'meta-title', 'severity' => 'high'],
-            ['label' => 'মেটা ডেসক্রিপশন নেই', 'count' => $noMetaDesc, 'icon' => 'meta-desc', 'severity' => 'high'],
-            ['label' => 'OG ইমেজ নেই', 'count' => $noOgImage, 'icon' => 'og-image', 'severity' => 'medium'],
-            ['label' => 'ফোকাস Keywords নেই', 'count' => $noFocusKw, 'icon' => 'keywords', 'severity' => 'medium'],
-            ['label' => 'ইন্ডেক্স করা যাচ্ছে No', 'count' => $notIndexable, 'icon' => 'no-index', 'severity' => 'low'],
-            ['label' => 'শর্ট meta_title (<30 chars)', 'count' => $shortTitle, 'icon' => 'short-title', 'severity' => 'medium'],
-            ['label' => 'শর্ট meta_desc (<50 chars)', 'count' => $shortDesc, 'icon' => 'short-desc', 'severity' => 'medium'],
+            ['label' => 'Missing meta title', 'count' => $noMetaTitle, 'icon' => 'meta-title', 'severity' => 'high'],
+            ['label' => 'Missing meta description', 'count' => $noMetaDesc, 'icon' => 'meta-desc', 'severity' => 'high'],
+            ['label' => 'Missing OG image', 'count' => $noOgImage, 'icon' => 'og-image', 'severity' => 'medium'],
+            ['label' => 'Missing focus keywords', 'count' => $noFocusKw, 'icon' => 'keywords', 'severity' => 'medium'],
+            ['label' => 'Not indexable', 'count' => $notIndexable, 'icon' => 'no-index', 'severity' => 'low'],
+            ['label' => 'Short meta_title (<30 chars)', 'count' => $shortTitle, 'icon' => 'short-title', 'severity' => 'medium'],
+            ['label' => 'Short meta_desc (<50 chars)', 'count' => $shortDesc, 'icon' => 'short-desc', 'severity' => 'medium'],
         ];
 
         $score = $total > 0 ? round((1 - ($noMetaTitle + $noMetaDesc + $noOgImage + $noFocusKw) / ($total * 4)) * 100) : 100;
@@ -123,7 +123,7 @@ class SeoController extends Controller
             ]);
         }
 
-        return back()->with('success', count($request->articles) . ' টি আর্টিকেলের SEO আপডেট হয়েছে!');
+        return back()->with('success', count($request->articles) . ' articles\' SEO updated!');
     }
 
     public function sitemap(): \Illuminate\Http\Response
@@ -176,7 +176,7 @@ class SeoController extends Controller
     {
         $request->validate(['content' => 'required|string']);
         Setting::set('robots_txt', $request->content);
-        return back()->with('success', 'robots.txt আপডেট হয়েছে!');
+        return back()->with('success', 'robots.txt updated!');
     }
 
     public function showRobotsTxt(): \Illuminate\Http\Response
@@ -210,7 +210,7 @@ class SeoController extends Controller
         $validated['old_url'] = '/' . ltrim($validated['old_url'], '/');
         Redirect::create($validated);
 
-        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects তৈরি করা হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirect created!');
     }
 
     public function redirectUpdate(Request $request, Redirect $redirect): RedirectResponse
@@ -234,13 +234,13 @@ class SeoController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $redirect->update($validated);
 
-        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects আপডেট হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirect updated!');
     }
 
     public function redirectDestroy(Redirect $redirect): RedirectResponse
     {
         $redirect->delete();
-        return redirect()->route('admin.seo.redirects')->with('success', 'Redirects ডিলিট করা হয়েছে!');
+        return redirect()->route('admin.seo.redirects')->with('success', 'Redirect deleted!');
     }
 
     public function articleSeoAnalysis(Article $article): \Illuminate\Http\JsonResponse
@@ -252,7 +252,7 @@ class SeoController extends Controller
             'label' => 'Meta Title',
             'value' => $article->meta_title ?? $article->title_bn,
             'status' => $titleLen >= 30 && $titleLen <= 60 ? 'pass' : ($titleLen < 30 ? 'warning' : 'fail'),
-            'message' => $titleLen < 30 ? 'খুব ছোট ('.$titleLen.' chars, 30-60 প্রয়োজন)' : ($titleLen > 60 ? 'খুব বড় ('.$titleLen.' chars, 30-60 প্রয়োজন)' : 'পারফেক্ট ('.$titleLen.' chars)'),
+            'message' => $titleLen < 30 ? 'Too short ('.$titleLen.' chars, 30-60 required)' : ($titleLen > 60 ? 'Too long ('.$titleLen.' chars, 30-60 required)' : 'Perfect ('.$titleLen.' chars)'),
         ];
 
         $descLen = mb_strlen($article->meta_description ?? '', 'UTF-8');
@@ -260,21 +260,21 @@ class SeoController extends Controller
             'label' => 'Meta Description',
             'value' => $article->meta_description ?? '—',
             'status' => $descLen >= 50 && $descLen <= 160 ? 'pass' : ($descLen === 0 ? 'fail' : 'warning'),
-            'message' => $descLen === 0 ? 'সেট করা হয়নি' : ($descLen < 50 ? 'খুব ছোট ('.$descLen.' chars)' : ($descLen > 160 ? 'খুব বড় ('.$descLen.' chars)' : 'পারফেক্ট ('.$descLen.' chars)')),
+            'message' => $descLen === 0 ? 'Not set' : ($descLen < 50 ? 'Too short ('.$descLen.' chars)' : ($descLen > 160 ? 'Too long ('.$descLen.' chars)' : 'Perfect ('.$descLen.' chars)')),
         ];
 
         $checks[] = [
             'label' => 'OG Image',
             'value' => $article->og_image ?? $article->featured_image ?? '—',
             'status' => !empty($article->og_image ?? $article->featured_image) ? 'pass' : 'fail',
-            'message' => empty($article->og_image ?? $article->featured_image) ? 'OG ইমেজ সেট করা হয়নি' : 'সেট করা আছে',
+            'message' => empty($article->og_image ?? $article->featured_image) ? 'OG image not set' : 'Set',
         ];
 
         $checks[] = [
             'label' => 'Focus Keywords',
             'value' => $article->focus_keywords ?? '—',
             'status' => !empty($article->focus_keywords) ? 'pass' : 'fail',
-            'message' => empty($article->focus_keywords) ? 'ফোকাস Keywords সেট করা হয়নি' : 'সেট করা আছে',
+            'message' => empty($article->focus_keywords) ? 'Focus keywords not set' : 'Set',
         ];
 
         $kwInTitle = false;
@@ -296,21 +296,21 @@ class SeoController extends Controller
             'label' => 'Keyword in Title',
             'value' => $kwInTitle ? 'Yes' : 'No',
             'status' => $kwInTitle ? 'pass' : 'fail',
-            'message' => $kwInTitle ? 'Keywords টাইটেলে আছে' : 'Keywords টাইটেলে নেই',
+            'message' => $kwInTitle ? 'Keyword found in title' : 'Keyword not found in title',
         ];
 
         $checks[] = [
             'label' => 'Keyword in Body',
             'value' => $kwInBody ? 'Yes' : 'No',
             'status' => $kwInBody ? 'pass' : 'fail',
-            'message' => $kwInBody ? 'Keywords বডিতে আছে' : 'Keywords বডিতে নেই',
+            'message' => $kwInBody ? 'Keyword found in body' : 'Keyword not found in body',
         ];
 
         $checks[] = [
             'label' => 'Indexable',
             'value' => $article->indexable ? 'Active' : 'Inactive',
             'status' => $article->indexable ? 'pass' : 'fail',
-            'message' => $article->indexable ? 'সার্চ ইঞ্জিন ইন্ডেক্স করতে পারবে' : 'ইন্ডেক্স বন্ধ আছে',
+            'message' => $article->indexable ? 'Search engines can index this page' : 'Indexing is disabled',
         ];
 
         $passCount = count(array_filter($checks, fn($c) => $c['status'] === 'pass'));

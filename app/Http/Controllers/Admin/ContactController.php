@@ -50,12 +50,12 @@ class ContactController extends Controller
         ]);
 
         return redirect()->route('admin.contacts.show', $contact)
-            ->with('success', 'রিপ্লাই পাঠানো হয়েছে!');
+            ->with('success', 'Reply sent!');
     }
 
     public function destroy(Contact $contact): RedirectResponse
     {
         $contact->delete();
-        return back()->with('success', 'Messages ডিলিট করা হয়েছে।');
+        return back()->with('success', 'Message deleted successfully.');
     }
 }

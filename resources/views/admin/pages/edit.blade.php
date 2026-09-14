@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', $titleBn . ' — এডিট')
+@section('title', $titleBn . ' — Edit')
 @push('editor')
 <x-head.editor-config/>
 @endpush

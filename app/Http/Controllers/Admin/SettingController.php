@@ -35,7 +35,7 @@ class SettingController extends Controller
         if (class_exists(ActivityLog::class)) {
             ActivityLog::truncate();
         }
-        return back()->with('success', 'Pages ভিউ ও Activity লগ ডাটা সাফ করা হয়েছে!');
+        return back()->with('success', 'Page views and activity log data cleared!');
     }
 
     public function update(Request $request): RedirectResponse
@@ -102,6 +102,6 @@ class SettingController extends Controller
         }
 
         return redirect()->route('admin.settings.index', ['tab' => $request->tab ?? 'general'])
-            ->with('success', 'Settings আপডেট হয়েছে!');
+            ->with('success', 'Settings updated!');
     }
 }

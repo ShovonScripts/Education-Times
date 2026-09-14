@@ -57,6 +57,6 @@ class PageController extends Controller
         Setting::set('page_' . $slug, $request->input('content', ''));
 
         return redirect()->route('admin.pages.index')
-            ->with('success', 'Pages Content আপডেট হয়েছে!');
+            ->with('success', 'Page content updated!');
     }
 }

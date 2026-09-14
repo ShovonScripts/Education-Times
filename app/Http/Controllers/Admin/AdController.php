@@ -48,7 +48,7 @@ class AdController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         Advertisement::create($validated);
 
-        return redirect()->route('admin.ads.index')->with('success', 'Ads তৈরি করা হয়েছে!');
+        return redirect()->route('admin.ads.index')->with('success', 'Ad created successfully!');
     }
 
     public function edit(Advertisement $ad): View
@@ -76,19 +76,19 @@ class AdController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $ad->update($validated);
 
-        return redirect()->route('admin.ads.index')->with('success', 'Ads আপডেট হয়েছে!');
+        return redirect()->route('admin.ads.index')->with('success', 'Ad updated successfully!');
     }
 
     public function toggleActive(Advertisement $ad): RedirectResponse
     {
         $ad->update(['is_active' => !$ad->is_active]);
-        return redirect()->route('admin.ads.index', request()->query())->with('success', 'Ads Status আপডেট হয়েছে!');
+        return redirect()->route('admin.ads.index', request()->query())->with('success', 'Ad status updated!');
     }
 
     public function destroy(Advertisement $ad): RedirectResponse
     {
         $ad->delete();
-        return redirect()->route('admin.ads.index')->with('success', 'Ads ডিলিট করা হয়েছে!');
+        return redirect()->route('admin.ads.index')->with('success', 'Ad deleted successfully!');
     }
 
     public function click(Advertisement $ad, Request $request): RedirectResponse

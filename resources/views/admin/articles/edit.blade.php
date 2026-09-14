@@ -1,15 +1,15 @@
 @extends('layouts.admin')
-@section('title', 'আর্টিকেল এডিট')
+@section('title', 'Edit Article')
 @section('content')
     <div class="mb-6">
         <a href="{{ route('admin.articles.index') }}" class="text-xs text-[#999] hover:text-[#0d0d0d] transition"><span class="flex items-center gap-1"><svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg> Go Back</span></a>
     </div>
-    <h1 class="font-serif text-2xl font-bold mb-6">আর্টিকেল এডিট</h1>
+    <h1 class="font-serif text-2xl font-bold mb-6">Edit Article</h1>
     <div class="bg-white dark:bg-[#1a1a1a] border border-[#e0e0e0] dark:border-[#333] p-6 md:p-8">
         <form method="POST" action="{{ route('admin.articles.update', $article) }}" enctype="multipart/form-data" class="space-y-4">
             @csrf @method('PUT')
             <div>
-                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Title (বাংলা) *</label>
+                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Title (Bengali) *</label>
                 <input type="text" name="title_bn" value="{{ old('title_bn', $article->title_bn) }}" required
                     class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">
             </div>
@@ -23,7 +23,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">প্রতিবেদক (একাধিক নির্বাচন করতে ctrl+ক্লিক)</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Reporter (hold ctrl+click to select multiple)</label>
                     <select name="staff_ids[]" multiple
                         class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white min-h-[100px]">
                         @foreach($staff as $s)
@@ -34,7 +34,7 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">জেলা</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">District</label>
                     <select name="district_id" class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">
                         <option value="">—</option>
                         @foreach($districts as $d)
@@ -50,39 +50,39 @@
                     class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">{{ old('excerpt_bn', $article->excerpt_bn) }}</textarea>
             </div>
             <div>
-                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">বডি *</label>
+                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Body *</label>
                 <textarea name="body_bn" data-editor required
                     class="w-full border border-[#e0e0e0] dark:border-[#444] px-4 py-2.5 text-sm">{{ old('body_bn', $article->body_bn) }}</textarea>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">ফিচার্ড ইমেজ (JPEG/PNG/WebP)</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Featured Image (JPEG/PNG/WebP)</label>
                     <input type="file" name="featured_image" accept="image/*"
                         class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white file:mr-3 file:border-0 file:bg-[#f5f5f5] dark:file:bg-[#333] file:px-3 file:py-1.5 file:text-xs file:font-medium">
                     @if(isset($article) && $article->featured_image_url)
                     <div class="mt-2 flex items-center gap-3">
                         <img src="{{ $article->featured_image_url }}" alt="" class="w-24 h-16 object-cover border border-[#e0e0e0] dark:border-[#444]">
                         <label class="flex items-center gap-2 text-xs text-[#999] cursor-pointer">
-                            <input type="checkbox" name="remove_featured_image" value="1" class="accent-[#E02020]"> বর্তমান ছবি সরান
+                            <input type="checkbox" name="remove_featured_image" value="1" class="accent-[#E02020]"> Remove current image
                         </label>
                     </div>
                     @endif
-                    <p class="text-xs text-[#999] mt-1">নতুন ছবি দিলে আগেরটি স্বয়ংক্রিয়ভাবে মুছে যাবে।</p>
+                    <p class="text-xs text-[#999] mt-1">Uploading a new image automatically deletes the old one.</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">ইউটিউব Video Link</label>
+                    <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">YouTube Video Link</label>
                     <input type="text" name="video_url" value="{{ old('video_url', $article->video_url) }}" placeholder="https://youtube.com/watch?v=..."
                         class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Scheduled প্রকাশের সময়</label>
+                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Scheduled Publish Time</label>
                 <input type="datetime-local" name="published_at" value="{{ old('published_at', $article->published_at?->format('Y-m-d\TH:i')) }}"
                     class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">
-                <p class="text-xs text-[#999] mt-1">শুধুমাত্র Scheduled প্রকাশের জন্য পূরণ করুন</p>
+                <p class="text-xs text-[#999] mt-1">Fill in only for scheduled publishing</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Tags (কমা দিয়ে)</label>
+                <label class="block text-sm font-medium text-[#666] dark:text-[#aaa] mb-1">Tags (comma separated)</label>
                 <input type="text" name="tags" value="{{ old('tags', $article->tags->pluck('tag')->join(', ')) }}"
                     class="w-full border border-[#e0e0e0] dark:border-[#444] dark:bg-[#222] dark:text-[#eee] px-4 py-2.5 text-sm focus:outline-none focus:border-[#0d0d0d] dark:focus:border-white">
             </div>
@@ -94,16 +94,16 @@
                     <input type="checkbox" name="is_featured" value="1" @checked($article->is_featured) class="accent-[#0d0d0d]"> Featured
                 </label>
                 <label class="flex items-center gap-2 text-sm text-[#666] dark:text-[#aaa]">
-                    <input type="checkbox" name="is_editor_pick" value="1" @checked($article->is_editor_pick) class="accent-[#0d0d0d]"> এডিটরস পিক
+                    <input type="checkbox" name="is_editor_pick" value="1" @checked($article->is_editor_pick) class="accent-[#0d0d0d]"> Editor's Pick
                 </label>
             </div>
             <div class="flex gap-3 pt-4 border-t border-[#e0e0e0] dark:border-[#333]">
                 <button type="submit" name="status" value="draft"
                     class="border border-[#0d0d0d] dark:border-white text-[#0d0d0d] dark:text-white px-6 py-2.5 text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition">Draft</button>
                 <button type="submit" name="status" value="published"
-                    class="bg-[#E02020] text-white px-6 py-2.5 text-sm font-medium hover:bg-red-700 transition">আপডেট ও প্রকাশ</button>
+                    class="bg-[#E02020] text-white px-6 py-2.5 text-sm font-medium hover:bg-red-700 transition">Update &amp; Publish</button>
                 <button type="submit" name="status" value="scheduled"
-                    class="bg-blue-600 text-white px-6 py-2.5 text-sm font-medium hover:bg-blue-700 transition">Scheduled করুন</button>
+                    class="bg-blue-600 text-white px-6 py-2.5 text-sm font-medium hover:bg-blue-700 transition">Schedule</button>
             </div>
         </form>
     </div>
@@ -118,7 +118,7 @@
             <div id="seoScore" class="text-2xl font-bold font-serif">—</div>
         </div>
         <div id="seoChecks" class="space-y-2"></div>
-        <p class="text-xs text-[#999] mt-3">Postsের Title, বডি, এবং SEO ফিল্ডের ভিত্তিতে অটো-জেNoরেটেড</p>
+        <p class="text-xs text-[#999] mt-3">Auto-generated from the Post's Title, Body, and SEO fields</p>
     </div>
 
 

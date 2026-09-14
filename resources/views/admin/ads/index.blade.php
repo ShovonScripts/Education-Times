@@ -13,7 +13,7 @@
         </a>
         <a href="{{ route('admin.ads.create') }}" class="btn-primary flex items-center gap-1.5">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            নতুন Ads
+            New Ads
         </a>
     </div>
 </div>
@@ -22,12 +22,12 @@
 <div class="flex flex-wrap gap-1 mb-5">
     <a href="{{ route('admin.ads.index') }}"
         class="px-3 py-1.5 text-xs font-medium transition {{ !request('position') || request('position') === 'all' ? 'bg-[#0d0d0d] text-white dark:bg-white dark:text-[#0d0d0d]' : 'bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#666] dark:text-[#aaa] hover:bg-[#e0e0e0] dark:hover:bg-[#333]' }}">
-        সব
+        All
     </a>
     @foreach($positions as $pos)
     <a href="{{ route('admin.ads.index', ['position' => $pos]) }}"
         class="px-3 py-1.5 text-xs font-medium transition {{ request('position') === $pos ? 'bg-[#0d0d0d] text-white dark:bg-white dark:text-[#0d0d0d]' : 'bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#666] dark:text-[#aaa] hover:bg-[#e0e0e0] dark:hover:bg-[#333]' }}">
-        {{ $pos === 'header' ? 'হেডার' : ($pos === 'sidebar' ? 'সাইডবার' : ($pos === 'article_top' ? 'আর্টিকেলের উপরে' : ($pos === 'article_bottom' ? 'আর্টিকেলের নিচে' : ($pos === 'footer' ? 'ফুটার' : 'পপআপ')))) }}
+        {{ $pos === 'header' ? 'Header' : ($pos === 'sidebar' ? 'Sidebar' : ($pos === 'article_top' ? 'Above Article' : ($pos === 'article_bottom' ? 'Below Article' : ($pos === 'footer' ? 'Footer' : 'Popup')))) }}
     </a>
     @endforeach
 </div>
@@ -37,11 +37,11 @@
         <thead class="admin-table-header">
             <tr>
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Title</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden sm:table-cell">পজিশন</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">সাইজ</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">টাইপ</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">ইম্প/ক্লিক</th>
-                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden xl:table-cell">শিডিউল</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden sm:table-cell">Position</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">Size</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden md:table-cell">Type</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden lg:table-cell">Imp/Clicks</th>
+                <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider hidden xl:table-cell">Schedule</th>
                 <th class="text-left p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Status</th>
                 <th class="text-right p-3 font-semibold text-[#666] text-xs uppercase tracking-wider">Action</th>
             </tr>
@@ -52,7 +52,7 @@
                 <td class="p-3 font-medium">{{ Str::limit($ad->title, 45) }}</td>
                 <td class="p-3 text-[#666] text-xs hidden sm:table-cell">
                     <span class="bg-[#f5f5f5] dark:bg-[#2a2a2a] px-2 py-0.5 text-xs">
-                        {{ $ad->position === 'header' ? 'হেডার' : ($ad->position === 'sidebar' ? 'সাইডবার' : ($ad->position === 'article_top' ? 'আর্টিকেলের উপরে' : ($ad->position === 'article_bottom' ? 'আর্টিকেলের নিচে' : ($ad->position === 'footer' ? 'ফুটার' : 'পপআপ')))) }}
+                        {{ $ad->position === 'header' ? 'Header' : ($ad->position === 'sidebar' ? 'Sidebar' : ($ad->position === 'article_top' ? 'Above Article' : ($ad->position === 'article_bottom' ? 'Below Article' : ($ad->position === 'footer' ? 'Footer' : 'Popup')))) }}
                     </span>
                 </td>
                 <td class="p-3 text-[#999] text-xs hidden md:table-cell">
@@ -66,10 +66,10 @@
                     <span class="flex items-center gap-1">
                         @if($ad->type === 'banner')
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        ব্যাNoর
+                        Banner
                         @else
                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                        কোড
+                        Code
                         @endif
                     </span>
                 </td>
@@ -85,11 +85,11 @@
                         }
                     @endphp
                     @if($scheduleStatus === 'active' && !$ad->starts_at && !$ad->ends_at)
-                        <span class="text-[#999]">সর্বদা</span>
+                        <span class="text-[#999]">Always</span>
                     @elseif($scheduleStatus === 'upcoming')
                         <span class="text-yellow-600 dark:text-yellow-400">{{ $ad->starts_at?->format('d M Y') }}</span>
                     @elseif($scheduleStatus === 'expired')
-                        <span class="text-red-500">{{ $ad->ends_at?->format('d M Y') }} পর্যন্ত</span>
+                        <span class="text-red-500">{{ $ad->ends_at?->format('d M Y') }} until</span>
                     @else
                         <span class="text-green-600 dark:text-green-400">{{ $ad->starts_at?->format('d M Y') }} - {{ $ad->ends_at?->format('d M Y') }}</span>
                     @endif
@@ -104,15 +104,15 @@
                             {{ $ad->is_active ? 'Inactive' : 'Active' }}
                         </button>
                     </form>
-                    <a href="{{ route('admin.ads.edit', $ad) }}" class="text-[#666] hover:text-[#0d0d0d] text-xs mr-2">এডিট</a>
-                    <form method="POST" action="{{ route('admin.ads.destroy', $ad) }}" class="inline" onsubmit="return confirm('নিশ্চিত?')">
+                    <a href="{{ route('admin.ads.edit', $ad) }}" class="text-[#666] hover:text-[#0d0d0d] text-xs mr-2">Edit</a>
+                    <form method="POST" action="{{ route('admin.ads.destroy', $ad) }}" class="inline" onsubmit="return confirm('Are you sure?')">
                         @csrf @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700 text-xs">ডিলিট</button>
+                        <button type="submit" class="text-red-500 hover:text-red-700 text-xs">Delete</button>
                     </form>
                 </td>
             </tr>
             @empty
-            <tr><td colspan="8" class="p-8 text-center text-sm text-[#999]">কোনো Ads নেই</td></tr>
+            <tr><td colspan="8" class="p-8 text-center text-sm text-[#999]">No ads yet</td></tr>
             @endforelse
         </tbody>
     </table>
