@@ -15,16 +15,15 @@ class SearchController extends Controller
         $categories = Category::where('is_active', true)->orderBy('order')->get();
         $districts = District::orderBy('name_bn')->get();
 
+        $request->validate([
+            'q' => 'nullable|string|max:100',
+        ]);
+
         $query = Article::where('status', 'published');
 
         if ($request->filled('q')) {
             $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('title_bn', 'like', "%{$search}%")
-                  ->orWhere('title_en', 'like', "%{$search}%")
-                  ->orWhere('body_bn', 'like', "%{$search}%")
-                  ->orWhere('excerpt_bn', 'like', "%{$search}%");
-            });
+            $query->whereFullText(['title_bn', 'title_en', 'excerpt_bn', 'body_bn'], $search);
         }
 
         if ($request->filled('category')) {

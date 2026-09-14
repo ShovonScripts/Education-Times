@@ -24,29 +24,29 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
-            'phone' => 'required|string|max:20|unique:users',
+            'phone' => 'nullable|string|max:20|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'district_id' => 'required|exists:districts,id',
-            'upazila' => 'required|string|max:255',
-            'school_name' => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
+            'district_id' => 'nullable|exists:districts,id',
+            'upazila' => 'nullable|string|max:255',
+            'school_name' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'],
+            'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
-            'district_id' => $validated['district_id'],
-            'upazila' => $validated['upazila'],
-            'school_name' => $validated['school_name'],
-            'designation' => $validated['designation'],
+            'district_id' => $validated['district_id'] ?? null,
+            'upazila' => $validated['upazila'] ?? null,
+            'school_name' => $validated['school_name'] ?? null,
+            'designation' => $validated['designation'] ?? null,
         ]);
 
         event(new Registered($user));
 
-        return redirect()->route('verification.notice')
-            ->with('success', 'নিবন্ধন সফল! আপনার ইমেইলে ভেরিফিকেশন লিংক পাঠানো হয়েছে।');
+        return redirect()->route('login')
+            ->with('success', 'নিবন্ধন সফল! আপনি এখন লগইন করতে পারেন।');
     }
 
     public function showLogin(): View

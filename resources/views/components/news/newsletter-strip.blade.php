@@ -24,6 +24,12 @@
                         <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
+                @if(session('newsletter_success'))
+                    <p class="newsletter-msg text-white/90 text-xs mt-3 bg-green-600/90 rounded px-3 py-2">{{ session('newsletter_success') }}</p>
+                @endif
+                @error('email')
+                    <p class="newsletter-msg text-white/90 text-xs mt-3 bg-[#E02020] rounded px-3 py-2">{{ $message }}</p>
+                @enderror
             </form>
         </div>
     </div>

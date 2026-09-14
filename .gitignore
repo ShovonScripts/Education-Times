@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Debug artifacts - never commit (contain secret keys / response dumps)
+public/diag.php
+public/artisan-run.php
+test_home.php
+resp.html
+response.html
