@@ -15,7 +15,7 @@ class Article extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'author_id', 'staff_id', 'category_id', 'district_id',
+        'author_id', 'category_id', 'district_id',
         'title_bn', 'title_en', 'slug',
         'excerpt_bn', 'body_bn',
         'featured_image', 'video_url', 'featured_image_caption', 'photo_credit',
@@ -33,17 +33,13 @@ class Article extends Model
             'is_editor_pick' => 'boolean',
             'is_slider' => 'boolean',
             'indexable' => 'boolean',
+            'status' => \App\Enums\ArticleStatus::class,
         ];
     }
 
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
-    }
-
-    public function staff(): BelongsTo
-    {
-        return $this->belongsTo(Staff::class);
     }
 
     public function staffs(): BelongsToMany
@@ -74,6 +70,16 @@ class Article extends Model
     public function pageViews(): MorphMany
     {
         return $this->morphMany(PageView::class, 'viewable');
+    }
+
+    public function viewCounts(): HasMany
+    {
+        return $this->hasMany(ArticleViewCount::class);
+    }
+
+    public function getViewCountAttribute(): int
+    {
+        return $this->viewCounts()->sum('views');
     }
 
     public function likedByUsers(): BelongsToMany

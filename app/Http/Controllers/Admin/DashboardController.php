@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
+use App\Models\ArticleViewCount;
 use App\Models\Comment;
-use App\Models\PageView;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -29,7 +29,7 @@ class DashboardController extends Controller
             'featured' => Article::where('is_featured', true)->where('status', 'published')->count(),
         ];
 
-        $recentArticles = Article::with(['author', 'category', 'staff', 'staffs'])
+        $recentArticles = Article::with(['author', 'category', 'staffs'])
             ->latest()
             ->take(10)
             ->get();
@@ -39,11 +39,10 @@ class DashboardController extends Controller
             ->take(10)
             ->pluck('id');
 
-        $viewCounts = PageView::where('viewable_type', Article::class)
-            ->whereIn('viewable_id', $articleIds)
-            ->select('viewable_id', DB::raw('count(*) as total'))
-            ->groupBy('viewable_id')
-            ->pluck('total', 'viewable_id');
+        $viewCounts = ArticleViewCount::whereIn('article_id', $articleIds)
+            ->select('article_id', DB::raw('sum(views) as total'))
+            ->groupBy('article_id')
+            ->pluck('total', 'article_id');
 
         $topViewed = Article::whereIn('id', $articleIds)
             ->with(['category'])
@@ -66,7 +65,7 @@ class DashboardController extends Controller
             ->with('category')
             ->get();
 
-        $todayViews = PageView::where('created_at', '>=', $today)->count();
+        $todayViews = ArticleViewCount::where('date', '>=', $today->toDateString())->sum('views');
 
         return view('admin.dashboard', compact(
             'stats', 'recentArticles', 'topViewed', 'recentComments', 'articlesByCategory', 'todayViews'

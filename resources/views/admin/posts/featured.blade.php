@@ -35,7 +35,7 @@
                     </div>
                 </td>
                 <td class="p-3 text-[#666] text-xs hidden md:table-cell">{{ $article->category?->name_bn }}</td>
-                <td class="p-3 text-[#999] text-xs hidden lg:table-cell">{{ number_format($article->pageViews()->count()) }}</td>
+                <td class="p-3 text-[#999] text-xs hidden lg:table-cell">{{ number_format($article->view_counts_sum_views ?? 0) }}</td>
                 <td class="p-3 text-right">
                     <div class="flex items-center justify-end gap-1">
                         <a href="{{ route('admin.articles.edit', $article) }}" class="text-[#666] hover:text-[#0d0d0d] p-1.5 transition" title="এডিট">

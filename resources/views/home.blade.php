@@ -2,6 +2,25 @@
 
 @section('title', config('app.name') . ' — শিক্ষার সব খবর এক নজরে')
 @section('meta_description', 'Education Times — বাংলাদেশের শিক্ষা সংবাদের বিশ্বস্ত পোর্টাল। শিক্ষা নীতিমালা, পরীক্ষা, ভর্তি, ক্যারিয়ার ও শিক্ষা বিষয়ক সর্বশেষ খবর।')
+@section('structured_data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "{{ config('app.name') }}",
+    "url": "{{ url('/') }}",
+    "description": "{{ \App\Models\Setting::get('site_tagline', 'শিক্ষার সব খবর এক নজরে') }}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ config('app.name') }}",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('favicon.ico') }}"
+        }
+    }
+}
+</script>
+@endsection
 
 @section('content')
 
@@ -13,7 +32,7 @@
     <div class="max-w-[1240px] mx-auto px-4 flex items-stretch h-11 relative">
         <div class="flex items-center gap-2 pr-6 z-10 bg-gray-900 shadow-[10px_0_15px_-5px_rgba(17,24,39,1)]">
             <div class="w-2 h-2 rounded-full bg-[#E02020] animate-pulse"></div>
-            <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white">{{ $breakingLabel ?? 'ব্রেকিং নিউজ' }}</span>
+            <span class="hidden md:inline text-[10px] md:text-xs font-bold uppercase tracking-widest text-white">{{ $breakingLabel ?? 'ব্রেকিং নিউজ' }}</span>
         </div>
         <div class="overflow-hidden flex-1 relative flex items-center">
             {{-- Duplicating the items and scrolling -50% makes it an infinite seamless loop --}}
@@ -226,19 +245,103 @@
 </div>
 
 <style>
-@keyframes ticker {
-    0%   { transform: translateX(100vw); }
-    100% { transform: translateX(-100%); }
-}
 .ticker-track {
-    animation: ticker 60s linear infinite;
     padding-right: 2rem;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+    will-change: transform;
 }
-.ticker-track:hover { animation-play-state: paused; }
-@media (max-width: 768px) {
-    .ticker-track { animation-duration: 35s; }
+.ticker-track:active {
+    cursor: grabbing;
 }
 .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 </style>
+
+<script>
+(function() {
+    const track = document.querySelector('.ticker-track');
+    if (!track) return;
+
+    const speed = 30;
+    let currentX = 0;
+    let isDragging = false;
+    let startX = 0;
+    let startTranslateX = 0;
+    let hasMoved = false;
+    let paused = false;
+    let lastTimestamp = performance.now();
+
+    function getHalfWidth() {
+        return track.scrollWidth / 2;
+    }
+
+    function normalizePosition(x) {
+        const half = getHalfWidth();
+        if (half <= 0) return x;
+        x = x % half;
+        if (x > 0) x -= half;
+        if (x <= -half) x += half;
+        return x;
+    }
+
+    function step(timestamp) {
+        const dt = Math.min(timestamp - lastTimestamp, 50);
+        lastTimestamp = timestamp;
+
+        if (!isDragging && !paused) {
+            currentX = normalizePosition(currentX - (speed * dt / 1000));
+            track.style.transform = 'translateX(' + currentX + 'px)';
+        }
+        requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+
+    track.addEventListener('pointerdown', function(e) {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.clientX;
+        startTranslateX = currentX;
+        track.style.cursor = 'grabbing';
+        track.setPointerCapture(e.pointerId);
+    });
+
+    track.addEventListener('pointermove', function(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 3) hasMoved = true;
+        currentX = startTranslateX + dx;
+        track.style.transform = 'translateX(' + currentX + 'px)';
+    });
+
+    function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        track.style.cursor = 'grab';
+        currentX = normalizePosition(currentX);
+        startTranslateX = currentX;
+    }
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerleave', endDrag);
+
+    track.addEventListener('mouseenter', function() {
+        if (!isDragging) paused = true;
+    });
+    track.addEventListener('mouseleave', function() {
+        paused = false;
+    });
+
+    track.addEventListener('click', function(e) {
+        if (hasMoved) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true);
+})();
+</script>
 @endsection

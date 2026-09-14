@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Models\ArticleTag;
 use App\Models\Category;
 use App\Enums\ArticleStatus;
 use App\Services\ArticleService;
@@ -12,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use function Clean;
 
 class StaffArticleController extends Controller
 {
@@ -19,7 +19,7 @@ class StaffArticleController extends Controller
     public function index(): View
     {
         $articles = Article::where('author_id', Auth::id())
-            ->with(['category', 'staff', 'staffs'])
+            ->with(['category', 'staffs'])
             ->latest()
             ->paginate(20);
         return view('staff.articles.index', compact('articles'));
@@ -46,25 +46,12 @@ class StaffArticleController extends Controller
         $validated['slug'] = $this->articleService->generateUniqueSlug($validated['title_bn']);
         $validated['author_id'] = Auth::id();
         $validated['status'] = ArticleStatus::DRAFT->value;
+        $validated['body_bn'] = clean($validated['body_bn']);
         $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
         unset($validated['featured_image']);
 
-        $article = Article::create($validated);
-
-        if ($request->hasFile('featured_image')) {
-            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
-        }
-
-        if (!empty($validated['tags'])) {
-            $tags = explode(',', $validated['tags']);
-            foreach ($tags as $tag) {
-                ArticleTag::create([
-                    'article_id' => $article->id,
-                    'tag' => trim($tag),
-                ]);
-            }
-        }
+        $article = $this->articleService->create($validated, $request->file('featured_image'));
 
         return redirect()->route('staff.articles.index')
             ->with('success', 'খসড়া সংরক্ষিত হয়েছে!');
@@ -96,41 +83,18 @@ class StaffArticleController extends Controller
             'action' => 'required|in:save,submit',
         ]);
 
-        $featuredImage = $article->featured_image;
-
-        if ($request->hasFile('featured_image')) {
-            $article->deleteStoredImages();
-            $featuredImage = $request->file('featured_image')->store('articles', 'public');
-        } elseif ($request->boolean('remove_featured_image')) {
-            $article->deleteStoredImages();
-            $featuredImage = null;
-        }
-
         unset($validated['featured_image']);
 
-        $article->update([
-            'title_bn' => $validated['title_bn'],
-            'category_id' => $validated['category_id'],
-            'body_bn' => $validated['body_bn'],
-            'excerpt_bn' => $validated['excerpt_bn'] ?? null,
-            'featured_image' => $featuredImage,
-            'video_url' => $validated['video_url'] ?? null,
-            'status' => $validated['action'] === 'submit' ? ArticleStatus::SUBMITTED->value : ArticleStatus::DRAFT->value,
-            'reading_time_minutes' => $this->articleService->calculateReadingTime($validated['body_bn']),
-        ]);
+        $validated['body_bn'] = clean($validated['body_bn']);
+        $validated['video_url'] = $validated['video_url'] ?? null;
+        $validated['status'] = $validated['action'] === 'submit' ? ArticleStatus::SUBMITTED->value : ArticleStatus::DRAFT->value;
+        $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
-        if (isset($validated['tags'])) {
-            $article->tags()->delete();
-            if (!empty($validated['tags'])) {
-                $tags = explode(',', $validated['tags']);
-                foreach ($tags as $tag) {
-                    ArticleTag::create([
-                        'article_id' => $article->id,
-                        'tag' => trim($tag),
-                    ]);
-                }
-            }
+        if ($request->boolean('remove_featured_image')) {
+            $validated['remove_featured_image'] = true;
         }
+
+        $this->articleService->update($article, $validated, $request->file('featured_image'));
 
         $msg = $validated['action'] === 'submit'
             ? 'আর্টিকেল পর্যালোচনার জন্য জমা দেওয়া হয়েছে!'

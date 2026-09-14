@@ -22,16 +22,17 @@
     <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('site_tagline', ''))">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ config('app.name') }}">
+    @hasSection('og_image')
+    <meta property="og:image" content="@yield('og_image')">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    @endif
+    @hasSection('structured_data')
+    @yield('structured_data')
+    @endif
+    @stack('meta')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
-    <script>
-    (function() {
-        var stored = localStorage.getItem('etTheme');
-        if (stored === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
-    })();
-    </script>
 </head>
 <body class="bg-white text-[#111] font-sans antialiased min-h-screen flex flex-col pb-14 md:pb-0">
     <div id="reading-progress" aria-hidden="true"></div>

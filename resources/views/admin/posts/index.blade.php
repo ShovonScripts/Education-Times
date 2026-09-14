@@ -122,7 +122,7 @@
                     </div>
                 </td>
                 <td class="p-3 text-[#666] hidden md:table-cell text-xs">{{ $article->category?->name_bn ?? '—' }}</td>
-                <td class="p-3 text-[#666] hidden lg:table-cell text-xs">{{ $article->staff?->name_bn ?? $article->author?->name ?? '—' }}</td>
+                <td class="p-3 text-[#666] hidden lg:table-cell text-xs">{{ $article->staffs->first()?->name_bn ?? $article->author?->name ?? '—' }}</td>
                 <td class="p-3">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full inline-block
@@ -140,7 +140,7 @@
                         </span>
                     </div>
                 </td>
-                <td class="p-3 text-[#999] text-xs hidden sm:table-cell">{{ number_format($article->pageViews()->count()) }}</td>
+                <td class="p-3 text-[#999] text-xs hidden sm:table-cell">{{ number_format($article->view_counts_sum_views ?? 0) }}</td>
                 <td class="p-3 text-[#999] text-xs hidden lg:table-cell">{{ $article->published_at?->format('d/m/Y H:i') ?? $article->created_at->format('d/m/Y') }}</td>
                 <td class="p-3 text-right">
                     <div class="flex items-center justify-end gap-1">

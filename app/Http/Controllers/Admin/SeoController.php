@@ -9,6 +9,7 @@ use App\Models\Redirect;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -19,21 +20,31 @@ class SeoController extends Controller
     {
         $total = Article::count();
         $published = Article::where('status', 'published')->count();
-        $noMetaTitle = Article::whereNull('meta_title')->orWhere('meta_title', '')->count();
-        $noMetaDesc = Article::whereNull('meta_description')->orWhere('meta_description', '')->count();
-        $noOgImage = Article::whereNull('og_image')->orWhere('og_image', '')->count();
-        $noFocusKw = Article::whereNull('focus_keywords')->orWhere('focus_keywords', '')->count();
+        $noMetaTitle = Article::where(function ($q) {
+            $q->whereNull('meta_title')->orWhere('meta_title', '');
+        })->count();
+        $noMetaDesc = Article::where(function ($q) {
+            $q->whereNull('meta_description')->orWhere('meta_description', '');
+        })->count();
+        $noOgImage = Article::where(function ($q) {
+            $q->whereNull('og_image')->orWhere('og_image', '');
+        })->count();
+        $noFocusKw = Article::where(function ($q) {
+            $q->whereNull('focus_keywords')->orWhere('focus_keywords', '');
+        })->count();
         $notIndexable = Article::where('indexable', false)->count();
         $shortTitle = Article::where('status', 'published')
             ->where(function ($q) {
-                $q->whereNull('meta_title')
-                    ->orWhere('meta_title', '')
-                    ->whereRaw('LENGTH(meta_title) < 30');
+                $q->where(function ($q2) {
+                    $q2->whereNull('meta_title')->orWhere('meta_title', '');
+                })->orWhereRaw('LENGTH(meta_title) < 30');
             })
             ->count();
         $shortDesc = Article::where('status', 'published')
             ->where(function ($q) {
-                $q->whereNull('meta_description')->orWhereRaw('LENGTH(meta_description) < 50');
+                $q->where(function ($q2) {
+                    $q2->whereNull('meta_description')->orWhere('meta_description', '');
+                })->orWhereRaw('LENGTH(meta_description) < 50');
             })
             ->count();
         $redirects = Redirect::count();
@@ -117,31 +128,40 @@ class SeoController extends Controller
 
     public function sitemap(): \Illuminate\Http\Response
     {
-        $articles = Article::where('status', 'published')->where('indexable', true)->latest('published_at')->get();
-        $categories = Category::where('is_active', true)->get();
+        $xml = Cache::remember('sitemap_xml', 3600, function () {
+            $urls = ['<?xml version="1.0" encoding="UTF-8"?>'];
+            $urls[] = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
+            $urls[] = '<url><loc>' . url('/') . '</loc><priority>1.0</priority><changefreq>hourly</changefreq></url>';
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
-        $xml .= '<url><loc>' . url('/') . '</loc><priority>1.0</priority><changefreq>hourly</changefreq></url>';
+            $categories = Category::where('is_active', true)->get(['slug']);
+            foreach ($categories as $cat) {
+                $urls[] = '<url><loc>' . url('/category/' . $cat->slug) . '</loc><priority>0.8</priority><changefreq>daily</changefreq></url>';
+            }
 
-        foreach ($categories as $cat) {
-            $xml .= '<url><loc>' . url('/category/' . $cat->slug) . '</loc><priority>0.8</priority><changefreq>daily</changefreq></url>';
-        }
+            Article::where('status', 'published')
+                ->where('indexable', true)
+                ->whereNotNull('published_at')
+                ->select('slug', 'title_bn', 'published_at', 'updated_at')
+                ->orderByDesc('published_at')
+                ->chunk(1000, function ($articles) use (&$urls) {
+                    foreach ($articles as $article) {
+                        $urls[] = '<url>';
+                        $urls[] = '<loc>' . url('/news/' . $article->slug) . '</loc>';
+                        $urls[] = '<lastmod>' . $article->updated_at->toIso8601String() . '</lastmod>';
+                        $urls[] = '<priority>0.9</priority>';
+                        $urls[] = '<changefreq>daily</changefreq>';
+                        $urls[] = '<news:news>';
+                        $urls[] = '<news:publication_date>' . $article->published_at?->toIso8601String() . '</news:publication_date>';
+                        $urls[] = '<news:title>' . htmlspecialchars($article->title_bn, ENT_XML1, 'UTF-8') . '</news:title>';
+                        $urls[] = '</news:news>';
+                        $urls[] = '</url>';
+                    }
+                });
 
-        foreach ($articles as $article) {
-            $xml .= '<url>';
-            $xml .= '<loc>' . url('/news/' . $article->slug) . '</loc>';
-            $xml .= '<lastmod>' . ($article->updated_at->toIso8601String()) . '</lastmod>';
-            $xml .= '<priority>0.9</priority>';
-            $xml .= '<changefreq>daily</changefreq>';
-            $xml .= '<news:news>';
-            $xml .= '<news:publication_date>' . $article->published_at->toIso8601String() . '</news:publication_date>';
-            $xml .= '<news:title>' . htmlspecialchars($article->title_bn, ENT_XML1, 'UTF-8') . '</news:title>';
-            $xml .= '</news:news>';
-            $xml .= '</url>';
-        }
+            $urls[] = '</urlset>';
 
-        $xml .= '</urlset>';
+            return implode('', $urls);
+        });
 
         return response($xml)->header('Content-Type', 'application/xml');
     }
@@ -175,7 +195,15 @@ class SeoController extends Controller
     {
         $validated = $request->validate([
             'old_url' => 'required|string|max:500|unique:redirects',
-            'new_url' => 'required|string|max:500',
+            'new_url' => ['required', 'string', 'max:500', function ($attribute, $value, $fail) {
+                if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                    $host = parse_url($value, PHP_URL_HOST);
+                    $allowedHost = parse_url(config('app.url'), PHP_URL_HOST);
+                    if ($host && $host !== $allowedHost) {
+                        $fail('External redirects are not allowed.');
+                    }
+                }
+            }],
             'status_code' => 'required|in:301,302',
         ]);
 
@@ -189,7 +217,15 @@ class SeoController extends Controller
     {
         $validated = $request->validate([
             'old_url' => 'required|string|max:500|unique:redirects,old_url,' . $redirect->id,
-            'new_url' => 'required|string|max:500',
+            'new_url' => ['required', 'string', 'max:500', function ($attribute, $value, $fail) {
+                if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                    $host = parse_url($value, PHP_URL_HOST);
+                    $allowedHost = parse_url(config('app.url'), PHP_URL_HOST);
+                    if ($host && $host !== $allowedHost) {
+                        $fail('External redirects are not allowed.');
+                    }
+                }
+            }],
             'status_code' => 'required|in:301,302',
             'is_active' => 'nullable|boolean',
         ]);
@@ -211,7 +247,7 @@ class SeoController extends Controller
     {
         $checks = [];
 
-        $titleLen = strlen($article->meta_title ?? $article->title_bn);
+        $titleLen = mb_strlen($article->meta_title ?? $article->title_bn, 'UTF-8');
         $checks[] = [
             'label' => 'Meta Title',
             'value' => $article->meta_title ?? $article->title_bn,
@@ -219,7 +255,7 @@ class SeoController extends Controller
             'message' => $titleLen < 30 ? 'খুব ছোট ('.$titleLen.' chars, 30-60 প্রয়োজন)' : ($titleLen > 60 ? 'খুব বড় ('.$titleLen.' chars, 30-60 প্রয়োজন)' : 'পারফেক্ট ('.$titleLen.' chars)'),
         ];
 
-        $descLen = strlen($article->meta_description ?? '');
+        $descLen = mb_strlen($article->meta_description ?? '', 'UTF-8');
         $checks[] = [
             'label' => 'Meta Description',
             'value' => $article->meta_description ?? '—',

@@ -31,14 +31,18 @@ $popup = \App\Models\Advertisement::where('position', 'popup')
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    if (!localStorage.getItem('popupAdClosed')) {
+    var DISMISS_KEY = 'popupAdClosedAt';
+    var DISMISS_TTL = 24 * 60 * 60 * 1000; // re-show after 24h
+    var dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+    if (!dismissedAt || (Date.now() - dismissedAt) > DISMISS_TTL) {
+        localStorage.removeItem(DISMISS_KEY);
         const el = document.getElementById('popupAd');
         if (el) setTimeout(function() { el.classList.remove('hidden'); }, 1000);
     }
 });
 function closePopup() {
     document.getElementById('popupAd')?.classList.add('hidden');
-    localStorage.setItem('popupAdClosed', 'true');
+    localStorage.setItem('popupAdClosedAt', String(Date.now()));
 }
 </script>
 @endif

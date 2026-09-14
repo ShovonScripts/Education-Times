@@ -70,10 +70,9 @@ class VideoDemoSeeder extends Seeder
             $catId = $categories->random()->id;
             $staffMember = $staff->random();
 
-            Article::create(array_merge($data, [
+            $article = Article::create(array_merge($data, [
                 'slug' => $slug,
                 'category_id' => $catId,
-                'staff_id' => $staffMember->id,
                 'status' => 'published',
                 'featured_image' => null,
                 'featured_image_caption' => null,
@@ -92,6 +91,8 @@ class VideoDemoSeeder extends Seeder
                 'created_at' => now()->subDays(1)->subHours($i),
                 'updated_at' => now()->subHours($i + 1),
             ]));
+
+            $article->staffs()->sync([$staffMember->id]);
 
             $this->command->info("  Created video article: {$data['title_bn']} ({$data['video_url']})");
         }

@@ -7,6 +7,7 @@ use App\Models\District;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
@@ -142,6 +143,11 @@ class UserController extends Controller
         }
 
         $user->update(['is_active' => !$user->is_active]);
+
+        if (!$user->is_active) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
         $status = $user->is_active ? 'Active' : 'Inactive';
         return back()->with('success', "{$user->name} কে {$status} করা হয়েছে!");
     }

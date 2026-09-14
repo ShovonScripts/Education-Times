@@ -67,9 +67,9 @@
                     <td class="p-2.5">
                         <input type="text" name="articles[{{ $loop->index }}][meta_title]" value="{{ $article->meta_title ?? $article->title_bn }}" class="admin-input w-full text-xs p-1.5 meta-title-input" data-index="{{ $loop->index }}">
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-[10px] char-count-{{ $loop->index }} {{ strlen($article->meta_title ?? $article->title_bn) >= 30 && strlen($article->meta_title ?? $article->title_bn) <= 60 ? 'text-green-600' : 'text-red-500' }}">{{ strlen($article->meta_title ?? $article->title_bn) }} chars</span>
-                            @if(strlen($article->meta_title ?? $article->title_bn) < 30)<span class="text-[10px] text-red-500">খুব ছোট</span>@endif
-                            @if(strlen($article->meta_title ?? $article->title_bn) > 60)<span class="text-[10px] text-red-500">খুব বড়</span>@endif
+                            <span class="text-[10px] char-count-{{ $loop->index }} {{ mb_strlen($article->meta_title ?? $article->title_bn) >= 30 && mb_strlen($article->meta_title ?? $article->title_bn) <= 60 ? 'text-green-600' : 'text-red-500' }}">{{ mb_strlen($article->meta_title ?? $article->title_bn) }} chars</span>
+                            @if(mb_strlen($article->meta_title ?? $article->title_bn) < 30)<span class="text-[10px] text-red-500">খুব ছোট</span>@endif
+                            @if(mb_strlen($article->meta_title ?? $article->title_bn) > 60)<span class="text-[10px] text-red-500">খুব বড়</span>@endif
                         </div>
                     </td>
                     <td class="p-2.5">

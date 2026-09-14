@@ -44,10 +44,9 @@ class SettingController extends Controller
             'site_name_bn' => 'nullable|string|max:255',
             'site_name_en' => 'nullable|string|max:255',
             'site_tagline' => 'nullable|string|max:500',
-            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:2048',
-            'site_footer_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:2048',
-            'site_favicon' => 'nullable|image|mimes:png,ico,jpg,jpeg|max:1024',
-            'site_loader' => 'nullable|image|mimes:gif,png,svg|max:2048',
+            'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+            'site_footer_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+            'site_loader' => 'nullable|image|mimes:gif,png|max:2048',
             'loader_enabled' => 'nullable|in:0,1',
             'footer_text' => 'nullable|string|max:2000',
             'footer_copyright' => 'nullable|string|max:500',
@@ -90,6 +89,10 @@ class SettingController extends Controller
 
         foreach ($validated as $key => $value) {
             if (in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader']) && $request->hasFile($key)) {
+                $old = Setting::get($key);
+                if ($old && !preg_match('#^(https?:)?//|data:#i', (string) $old)) {
+                    Storage::disk('public')->delete((string) $old);
+                }
                 $file = $request->file($key);
                 $path = $file->store('settings', 'public');
                 Setting::set($key, $path);

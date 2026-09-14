@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\ArticleViewCount;
 use App\Models\Category;
-use App\Models\PageView;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\View;
 
@@ -25,17 +26,44 @@ class ArticleController extends Controller
             ->take(3)
             ->get();
 
-        PageView::create([
-            'viewable_type' => Article::class,
-            'viewable_id' => $article->id,
-            'ip' => Request::ip(),
-            'user_agent' => Request::userAgent(),
-            'referer' => Request::header('referer'),
-            'user_id' => auth()->id(),
-            'created_at' => now(),
-        ]);
+        $comments = Comment::where('article_id', $article->id)
+            ->where('status', 'approved')
+            ->whereNull('parent_id')
+            ->with('user', 'replies.user')
+            ->latest()
+            ->get();
 
-        return view('article.show', compact('article', 'related'));
+        $botPatterns = ['Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot', 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'facebookexternalhit', 'Twitterbot', 'LinkedInBot', 'WhatsApp', 'curl', 'wget', 'python', 'requests', 'spider', 'crawler'];
+        $userAgent = Request::userAgent() ?? '';
+        $isBot = false;
+        foreach ($botPatterns as $pattern) {
+            if (stripos($userAgent, $pattern) !== false) {
+                $isBot = true;
+                break;
+            }
+        }
+
+        if (!$isBot) {
+            ArticleViewCount::upsert(
+                [
+                    'article_id' => $article->id,
+                    'date' => now()->toDateString(),
+                    'views' => 1,
+                ],
+                ['article_id', 'date'],
+                ['views' => new \Illuminate\Database\Query\Expression('views + 1')]
+            );
+        }
+
+        // Like/save state for the current user (avoid N+1 on two small queries)
+        $liked = false;
+        $saved = false;
+        if ($user = auth()->user()) {
+            $liked = $user->likedArticles()->where('article_id', $article->id)->exists();
+            $saved = $user->savedArticles()->where('article_id', $article->id)->exists();
+        }
+
+        return view('article.show', compact('article', 'related', 'comments', 'liked', 'saved'));
     }
 
     public function category($slug): View

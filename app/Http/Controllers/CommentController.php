@@ -5,24 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class CommentController extends Controller
 {
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'article_id' => 'required|exists:articles,id',
             'body' => 'required|string|max:2000',
-            'parent_id' => 'nullable|exists:comments,id',
+            'parent_id' => ['nullable', Rule::exists('comments', 'id')->where('article_id', $request->article_id)],
         ]);
 
         Comment::create([
-            'article_id' => $validated['article_id'],
+            'article_id' => $request->article_id,
             'user_id' => Auth::id(),
-            'body' => $validated['body'],
-            'parent_id' => $validated['parent_id'] ?? null,
+            'body' => $request->body,
+            'parent_id' => $request->parent_id,
+            'status' => 'pending',
         ]);
 
-        return back()->with('success', 'আপনার মন্তব্য প্রকাশিত হয়েছে।');
+        return back()->with('success', 'আপনার মন্তব্য অনুমোদনের জন্য পাঠানো হয়েছে।');
     }
 }

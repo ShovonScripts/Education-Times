@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Illuminate\Http\Response;
 
@@ -92,7 +93,12 @@ class AdController extends Controller
 
     public function click(Advertisement $ad, Request $request): RedirectResponse
     {
-        $ad->increment('clicks');
+        $ip = $request->ip();
+        $key = "ad_click_{$ad->id}_{$ip}";
+        if (!Cache::has($key)) {
+            $ad->increment('clicks');
+            Cache::put($key, true, 60);
+        }
         $url = $request->query('url', '/');
         if (!str_starts_with($url, '/') || str_starts_with($url, '//')) {
             $url = '/';
@@ -102,7 +108,12 @@ class AdController extends Controller
 
     public function impression(Advertisement $ad): Response
     {
-        $ad->increment('impressions');
+        $ip = request()->ip();
+        $key = "ad_impression_{$ad->id}_{$ip}";
+        if (!Cache::has($key)) {
+            $ad->increment('impressions');
+            Cache::put($key, true, 60);
+        }
         return response('ok', 200);
     }
 }

@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Article;
 use App\Models\ArticleTag;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ArticleService
 {
@@ -43,5 +45,70 @@ class ArticleService
         $wordCount = count($words);
         $minutes = (int) ceil($wordCount / 200);
         return max(1, $minutes);
+    }
+
+    private function processImage(UploadedFile $image): string
+    {
+        $img = Image::read($image);
+        $img->scaleDown(width: 1200);
+        $filename = uniqid() . '.webp';
+        $path = 'articles/' . $filename;
+        $img->toWebp(82)->save(storage_path('app/public/' . $path));
+        return $path;
+    }
+
+    public function create(array $data, ?UploadedFile $image = null): Article
+    {
+        $article = Article::create($data);
+
+        if ($image) {
+            $article->update(['featured_image' => $this->processImage($image)]);
+        }
+
+        if (!empty($data['tags'])) {
+            $tags = explode(',', $data['tags']);
+            foreach ($tags as $tag) {
+                $tag = trim($tag);
+                if ($tag !== '') {
+                    ArticleTag::create([
+                        'article_id' => $article->id,
+                        'tag' => $tag,
+                    ]);
+                }
+            }
+        }
+
+        return $article;
+    }
+
+    public function update(Article $article, array $data, ?UploadedFile $image = null): Article
+    {
+        if ($image) {
+            $article->deleteStoredImages();
+            $data['featured_image'] = $this->processImage($image);
+        } elseif (isset($data['remove_featured_image']) && $data['remove_featured_image']) {
+            $article->deleteStoredImages();
+            $data['featured_image'] = null;
+        }
+
+        $article->update($data);
+
+        if (array_key_exists('tags', $data)) {
+            $article->tags()->delete();
+            if (!empty($data['tags'])) {
+                $tags = explode(',', $data['tags']);
+                foreach ($tags as $tag) {
+                    $tag = trim($tag);
+                    if ($tag !== '') {
+                        ArticleTag::create([
+                            'article_id' => $article->id,
+                            'tag' => $tag,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return $article;
     }
 }

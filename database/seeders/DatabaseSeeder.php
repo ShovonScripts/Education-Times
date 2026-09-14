@@ -14,9 +14,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $demoSeeder = new DemoDataSeeder();
-        $demoSeeder->setCommand($this->command);
-        $demoSeeder->seedAllUserTypes();
+        $demoSeeder = null;
+
+        if (!app()->environment('production')) {
+            $demoSeeder = new DemoDataSeeder();
+            $demoSeeder->setCommand($this->command);
+            $demoSeeder->seedAllUserTypes();
+        }
 
         $this->seedDistricts();
         $this->seedCategories();
@@ -26,15 +30,17 @@ class DatabaseSeeder extends Seeder
         $this->call(VideoDemoSeeder::class);
         $this->call(NewsSeeder::class);
 
-        $this->safe($demoSeeder, 'seedComments');
-        $this->safe($demoSeeder, 'seedArticleTags');
-        $this->safe($demoSeeder, 'seedArticleLikes');
-        $this->safe($demoSeeder, 'seedSavedArticles');
-        $this->safe($demoSeeder, 'seedArchiveDocuments');
-        $this->safe($demoSeeder, 'seedRedirects');
-        $this->safe($demoSeeder, 'seedSettings');
-        $this->safe($demoSeeder, 'seedContacts');
-        $this->safe($demoSeeder, 'seedAdvertisements');
+        if ($demoSeeder) {
+            $this->safe($demoSeeder, 'seedComments');
+            $this->safe($demoSeeder, 'seedArticleTags');
+            $this->safe($demoSeeder, 'seedArticleLikes');
+            $this->safe($demoSeeder, 'seedSavedArticles');
+            $this->safe($demoSeeder, 'seedArchiveDocuments');
+            $this->safe($demoSeeder, 'seedRedirects');
+            $this->safe($demoSeeder, 'seedSettings');
+            $this->safe($demoSeeder, 'seedContacts');
+            $this->safe($demoSeeder, 'seedAdvertisements');
+        }
     }
 
     private function safe(object $seeder, string $method): void
@@ -184,7 +190,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'দেশের বিদ্যালয়গুলোতে ডিজিটাল প্রযুক্তির ব্যবহার ক্রমশ বাড়ছে। সরকার ডিজিটাল শিক্ষা কার্যক্রম জোরদার করছে।',
                 'body_bn' => '<p>সরকারি বিদ্যালয়গুলোতে ডিজিটাল প্রযুক্তির ব্যবহার দিন দিন বেড়েই চলেছে। ইতিমধ্যে দেশের ৮০ শতাংশ বিদ্যালয়ে মাল্টিমিডিয়া ক্লাসরুম স্থাপন করা হয়েছে।</p><p>শিক্ষা মন্ত্রণালয় সূত্রে জানা গেছে, আগামী দুই বছরের মধ্যে শতভাগ বিদ্যালয়ে ডিজিটাল ক্লাসরুম স্থাপনের লক্ষ্য নির্ধারণ করা হয়েছে।</p><p>শিক্ষা বিশেষজ্ঞরা বলছেন, ডিজিটাল প্রযুক্তি শিক্ষার্থীদের শেখার আগ্রহ বাড়াতে এবং শিক্ষকদের পাঠদান সহজ করতে গুরুত্বপূর্ণ ভূমিকা রাখছে।</p>',
                 'category_id' => $categories->first()->id,
-                'staff_id' => $staff->first()->id,
+                'staff_ids' => [$staff->first()->id],
                 'reading_time_minutes' => 3,
                 'is_featured' => true,
                 'is_editor_pick' => true,
@@ -194,7 +200,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'সরকার শিক্ষক নিয়োগে নতুন নীতিমালা অনুমোদন করেছে। এতে স্বচ্ছতা ও জবাবদিহিতা নিশ্চিত হবে বলে আশা করা যাচ্ছে।',
                 'body_bn' => '<p>সরকার বিদ্যালয়ে শিক্ষক নিয়োগের নতুন নীতিমালা অনুমোদন করেছে। এই নীতিমালায় নিয়োগ প্রক্রিয়াকে আরও স্বচ্ছ ও জবাবদিহিমূলক করার পদক্ষেপ নেওয়া হয়েছে।</p><p>নতুন নীতিমালা অনুযায়ী, শিক্ষক নিয়োগে থাকবে লিখিত পরীক্ষা, মৌখিক পরীক্ষা ও শিক্ষকতা দক্ষতা মূল্যায়ন। প্রতিটি ধাপে প্রার্থীদের নম্বর সংরক্ষিত থাকবে।</p><p>শিক্ষক নেতারা নতুন নীতিমালাকে স্বাগত জানিয়েছেন এবং বলেছেন, এতে মেধাবী প্রার্থীরা শিক্ষকতা পেশায় আসতে আগ্রহী হবেন।</p>',
                 'category_id' => $categories->where('slug', 'recruitment-transfer')->first()?->id ?? $categories->first()->id,
-                'staff_id' => $staff->skip(1)->first()->id,
+                'staff_ids' => [$staff->skip(1)->first()->id],
                 'reading_time_minutes' => 4,
                 'is_breaking' => true,
                 'is_editor_pick' => true,
@@ -204,7 +210,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'এসএসসি পরীক্ষার সময়সূচি প্রকাশ করা হয়েছে। আগামী মাসে শুরু হবে এই পরীক্ষা।',
                 'body_bn' => '<p>শিক্ষা বোর্ড এসএসসি পরীক্ষার সময়সূচি প্রকাশ করেছে। আগামী মাসে সারাদেশে একযোগে এই পরীক্ষা অনুষ্ঠিত হবে।</p><p>পরীক্ষা সুষ্ঠুভাবে সম্পাদনের জন্য ইতিমধ্যে প্রয়োজনীয় প্রস্তুতি নেওয়া হয়েছে। প্রতিটি উপজেলায় পরীক্ষা কেন্দ্র নির্ধারণ করা হয়েছে।</p><p>শিক্ষা মন্ত্রণালয়ের পক্ষ থেকে জানানো হয়েছে, এবারের পরীক্ষায় কোনো রকম অনিয়ম বরদাস্ত করা হবে না। কেন্দ্রগুলোতে সিসি ক্যামেরা বসানো হবে।</p>',
                 'category_id' => $categories->where('slug', 'exam-results')->first()?->id ?? $categories->first()->id,
-                'staff_id' => $staff->skip(2)->first()->id,
+                'staff_ids' => [$staff->skip(2)->first()->id],
                 'reading_time_minutes' => 3,
             ],
             [
@@ -212,7 +218,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'বিদ্যালয়ের শিক্ষার্থীদের মানসিক স্বাস্থ্য সুরক্ষায় সরকার নতুন উদ্যোগ গ্রহণ করেছে।',
                 'body_bn' => '<p>বিদ্যালয়ের শিক্ষার্থীদের মানসিক স্বাস্থ্য সুরক্ষায় সরকার নতুন উদ্যোগ গ্রহণ করেছে। এই উদ্যোগের আওতায় প্রতিটি বিদ্যালয়ে একজন করে কাউন্সেলর নিয়োগ দেওয়া হবে।</p><p>শিক্ষা বিশেষজ্ঞরা বলছেন, শিক্ষার্থীদের মানসিক স্বাস্থ্যের প্রতি নজর দেওয়া অত্যন্ত জরুরি। বিশেষত কোভিড-১৯ মহামারির পর শিক্ষার্থীদের মধ্যে মানসিক চাপ বেড়েছে।</p><p>ইতিমধ্যে বেশ কিছু বিদ্যালয়ে পাইলট প্রকল্প হিসেবে কাউন্সেলিং সেবা চালু করা হয়েছে, যা সফল হয়েছে।</p>',
                 'category_id' => $categories->where('slug', 'national')->first()?->id ?? $categories->first()->id,
-                'staff_id' => $staff->skip(3)->first()->id,
+                'staff_ids' => [$staff->skip(3)->first()->id],
                 'reading_time_minutes' => 3,
             ],
             [
@@ -220,7 +226,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'শিক্ষকদের বেতন কাঠামো পুনর্বিবেচনার দাবি জানিয়েছেন শিক্ষক নেতারা। বর্তমান বেতনে জীবনযাপন কঠিন বলে জানান তারা।',
                 'body_bn' => '<p>সারাদেশের শিক্ষকরা তাদের বেতন কাঠামো পুনর্বিবেচনার দাবি জানিয়েছেন। বুধবার রাজধানীর একটি হোটেলে আয়োজিত সংবাদ সম্মেলনে শিক্ষক নেতারা এই দাবি জানান।</p><p>শিক্ষক নেতারা বলেছেন, বর্তমান বেতন কাঠামোতে একজন শিক্ষকের পক্ষে জীবনযাপন করা অত্যন্ত কঠিন। মূল্যস্ফীতি বিবেচনায় বেতন কাঠামো হালনাগাদ করা জরুরি।</p><p>তারা দ্রুত সময়ের মধ্যে শিক্ষকদের বেতন কাঠামো পুনর্বিবেচনার জন্য সরকারের প্রতি আহ্বান জানিয়েছেন।</p>',
                 'category_id' => $categories->where('slug', 'teacher-rights')->first()?->id ?? $categories->first()->id,
-                'staff_id' => $staff->skip(4)->first()->id,
+                'staff_ids' => [$staff->skip(4)->first()->id],
                 'reading_time_minutes' => 4,
                 'is_featured' => true,
             ],
@@ -229,7 +235,7 @@ class DatabaseSeeder extends Seeder
                 'excerpt_bn' => 'আগামী শিক্ষাবর্ষ থেকে বিদ্যালয়ে নতুন পাঠ্যক্রম চালু হচ্ছে। এতে ব্যবহারিক শিক্ষার ওপর জোর দেওয়া হয়েছে।',
                 'body_bn' => '<p>আগামী শিক্ষাবর্ষ থেকে দেশের সব বিদ্যালয়ে নতুন পাঠ্যক্রম চালু করা হবে। এই পাঠ্যক্রমে ব্যবহারিক শিক্ষা ও দক্ষতা উন্নয়নের ওপর জোর দেওয়া হয়েছে।</p><p>জাতীয় শিক্ষাক্রম ও পাঠ্যপুস্তক বোর্ড (এনসিটিবি) ইতিমধ্যে নতুন পাঠ্যক্রমের খসড়া চূড়ান্ত করেছে। বিশেষজ্ঞদের মতামত নিয়ে এতে কিছু পরিবর্তন আনা হয়েছে।</p><p>নতুন পাঠ্যক্রমে শিক্ষার্থীদের পড়া, লেখা, গণনা ও বিশ্লেষণ ক্ষমতা বিকাশের ওপর বিশেষ গুরুত্ব দেওয়া হয়েছে।</p>',
                 'category_id' => $categories->where('slug', 'education-policy')->first()?->id ?? $categories->first()->id,
-                'staff_id' => $staff->skip(5)->first()->id,
+                'staff_ids' => [$staff->skip(5)->first()->id],
                 'reading_time_minutes' => 3,
                 'is_editor_pick' => true,
             ],
@@ -240,6 +246,8 @@ class DatabaseSeeder extends Seeder
             if (Article::where('slug', $slug)->exists()) {
                 continue;
             }
+            $staffIds = $data['staff_ids'] ?? [];
+            unset($data['staff_ids']);
             $article = Article::create(array_merge($data, [
                 'slug' => $slug,
                 'status' => 'published',
@@ -260,6 +268,10 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now()->subDays($i + 1),
                 'updated_at' => now()->subHours($i * 4),
             ]));
+
+            if (!empty($staffIds)) {
+                $article->staffs()->sync($staffIds);
+            }
 
             $this->command->info("  Created article: {$data['title_bn']}");
         }

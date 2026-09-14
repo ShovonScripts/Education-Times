@@ -14,7 +14,6 @@ trait ClearsHomepageCache
             'home_featured_stories',
             'home_slider_articles',
             'home_breaking_stories',
-            'home_most_read',
             'home_editor_picks',
             'home_popular_tags',
             'home_latest',

@@ -4,24 +4,24 @@
    SELF-HOSTED FONT DECLARATIONS
    ============================================ */
 
-/* Shurjo — Primary Bengali Font (Regular 400) */
+/* Kalpurush — Primary Bengali Font (Regular 400) */
 @font-face {
-    font-family: 'Shurjo';
+    font-family: 'Kalpurush';
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('/fonts/ShurjoWeb_400.woff2') format('woff2'),
-         url('/fonts/ShurjoWeb_400.woff') format('woff');
+    src: url('/fonts/kalpurush-webfont.woff2') format('woff2'),
+         url('/fonts/kalpurush-webfont.woff') format('woff');
 }
 
-/* Shurjo — Primary Bengali Font (Bold 700) */
+/* Kalpurush — Primary Bengali Font (Bold 700) */
 @font-face {
-    font-family: 'Shurjo';
+    font-family: 'Kalpurush';
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('/fonts/ShurjoWeb_700.woff2') format('woff2'),
-         url('/fonts/ShurjoWeb_700.woff') format('woff');
+    src: url('/fonts/kalpurush-webfont.woff2') format('woff2'),
+         url('/fonts/kalpurush-webfont.woff') format('woff');
 }
 
 /* Roboto — Secondary English Font (Regular 400) */
@@ -48,7 +48,7 @@
    CSS CUSTOM PROPERTIES — TYPOGRAPHY
    ============================================ */
 :root {
-    --font-bengali: 'Shurjo', 'Siyam Rupali', 'SolaimanLipi', 'Roboto', 'Arial', sans-serif;
+    --font-bengali: 'Kalpurush', 'Siyam Rupali', 'SolaimanLipi', 'Roboto', 'Arial', sans-serif;
     --font-english: 'Roboto', 'Arial', 'Helvetica', sans-serif;
     --font-fallback: 'Siyam Rupali', 'Roboto', 'Arial', 'Helvetica', sans-serif;
 
@@ -155,17 +155,8 @@ article .overflow-hidden {
 /* Breadcrumb separator style */
 nav .breadcrumb-sep { color: #ccc; margin: 0 4px; }
 
-/* Ticker scroll animation */
-@keyframes ticker-scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-.ticker-track {
-    animation: ticker-scroll 30s linear infinite;
-}
-.ticker-track:hover {
-    animation-play-state: paused;
-}
+/* Ticker is driven by JS in home.blade.php (rAF + drag/pause).
+   No CSS animation here — it would fight the JS transform on .ticker-track. */
 
 /* Opinion strip avatar ring on hover */
 .opinion-avatar:hover {
@@ -207,7 +198,7 @@ body {
 
 [x-cloak] { display: none !important; }
 
-/* All Bengali UI/text uses Shurjo */
+/* All Bengali UI/text uses Kalpurush */
 h1, h2, h3, h4, h5, h6,
 p, li, a, button, label, span, small, strong, em,
 input, textarea, select, option, legend, fieldset {
@@ -627,6 +618,15 @@ p { line-height: var(--lh-relaxed); }
 }
 
 /* Dark mode overrides for common hardcoded classes */
+.dark .bg-\[\#111\] { background-color: #e8e8e8 !important; color: #121212; }
+.dark .text-\[\#111\] { color: #e8e8e8 !important; }
+.dark .border-\[\#111\] { border-color: #555555 !important; }
+.dark .text-\[\#222\] { color: #d8d8d8 !important; }
+.dark .text-\[\#444\] { color: #b8b8b8 !important; }
+.dark .text-\[\#555\] { color: #b0b0b0 !important; }
+.dark .text-\[\#888\] { color: #999999 !important; }
+.dark .bg-\[\#e5e5e5\] { background-color: #2a2a2a !important; }
+.dark .border-\[\#f0f0f0\] { border-color: #2e2e2e !important; }
 .dark .bg-\[\#f5f5f5\] { background-color: #121212 !important; }
 .dark .bg-white { background-color: #1e1e1e !important; }
 .dark .text-\[\#1a1a1a\] { color: #e0e0e0 !important; }

@@ -145,6 +145,23 @@
                     </p>
                     @endif
                 </div>
+
+                <h4 class="text-[11px] font-bold uppercase tracking-widest text-white mt-10 mb-5 flex items-center gap-2">
+                    <span class="w-1 h-3.5 bg-[#E02020] rounded-full"></span>
+                    Partners
+                </h4>
+                <div class="flex flex-wrap gap-3">
+                    @php
+                        $partners = \App\Models\Partner::where('is_active', true)->orderBy('order')->get();
+                    @endphp
+                    @if($partners->isNotEmpty())
+                        @foreach($partners as $partner)
+                        <a href="{{ $partner->url ?: '#' }}" target="_blank" rel="noopener" class="block w-20 h-20 bg-white rounded border border-[#222] hover:border-[#E02020] transition-all p-1.5 flex items-center justify-center" title="{{ $partner->name }}">
+                            <img src="{{ Storage::url($partner->logo) }}" alt="{{ $partner->name }}" class="max-w-full max-h-full object-contain">
+                        </a>
+                        @endforeach
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -153,7 +170,7 @@
     <div class="border-t border-[#222] bg-[#050505]">
         <div class="max-w-[1240px] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#666]">
             <p>{{ \App\Models\Setting::get('footer_copyright', '© ' . date('Y') . ' Education Times. সর্বস্বত্ব সংরক্ষিত।') }}</p>
-            <p class="flex items-center gap-1">Developed by <a href="https://prodo.top" target="_blank" rel="noopener" class="text-white hover:text-[#E02020] font-bold tracking-wider transition-colors">ProDo</a></p>
+            <p class="flex items-center gap-1">Crafted by <a href="https://prodo.top" target="_blank" rel="noopener" class="text-white hover:text-[#E02020] font-bold tracking-wider transition-colors">ProDo</a></p>
         </div>
     </div>
 </footer>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Article;
-use App\Models\ArticleTag;
 use App\Models\Category;
 use App\Models\District;
 use App\Models\Staff;
@@ -17,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use function Clean;
 
 class ArticleController extends Controller
 {
@@ -26,7 +26,7 @@ class ArticleController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Article::with(['author', 'category', 'staff', 'staffs']);
+        $query = Article::with(['author', 'category', 'staffs']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -51,7 +51,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('Scheduled Postsের জন্য সময় ভবিষ্যতের হতে হবে।');
+                    $fail('শিডিউল পোস্টের প্রকাশের সময় ভবিষ্যতের হতে হবে।');
                 }
             };
         }
@@ -76,6 +76,7 @@ class ArticleController extends Controller
 
         $validated['slug'] = $this->articleService->generateUniqueSlug($validated['title_bn']);
         $validated['author_id'] = Auth::id();
+        $validated['body_bn'] = clean($validated['body_bn']);
         $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
         if ($validated['status'] === ArticleStatus::PUBLISHED->value && empty($validated['published_at'])) {
@@ -86,26 +87,10 @@ class ArticleController extends Controller
 
         unset($validated['featured_image']);
 
-        $article = Article::create($validated);
-
-        if ($request->hasFile('featured_image')) {
-            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
-        }
+        $article = $this->articleService->create($validated, $request->file('featured_image'));
 
         if (!empty($validated['staff_ids'])) {
             $article->staffs()->sync($validated['staff_ids']);
-            $article->staff_id = $validated['staff_ids'][0];
-            $article->save();
-        }
-
-        if (!empty($validated['tags'])) {
-            $tags = explode(',', $validated['tags']);
-            foreach ($tags as $tag) {
-                ArticleTag::create([
-                    'article_id' => $article->id,
-                    'tag' => trim($tag),
-                ]);
-            }
         }
 
         $this->clearHomepageCache();
@@ -128,7 +113,7 @@ class ArticleController extends Controller
         if ($request->status === 'scheduled') {
             $publishedAtRule[] = function ($attribute, $value, $fail) {
                 if ($value && \Carbon\Carbon::parse($value)->isPast()) {
-                    $fail('Scheduled Postsের জন্য সময় ভবিষ্যতের হতে হবে।');
+                    $fail('শিডিউল পোস্টের প্রকাশের সময় ভবিষ্যতের হতে হবে।');
                 }
             };
         }
@@ -155,6 +140,7 @@ class ArticleController extends Controller
             $validated['slug'] = $this->articleService->generateUniqueSlug($validated['title_bn'] ?? $article->title_bn, $article->id);
         }
 
+        $validated['body_bn'] = clean($validated['body_bn']);
         $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
         if ($validated['status'] === ArticleStatus::PUBLISHED->value && !$article->published_at) {
@@ -165,31 +151,14 @@ class ArticleController extends Controller
 
         unset($validated['featured_image']);
 
-        $article->update($validated);
-
-        if ($request->hasFile('featured_image')) {
-            $article->deleteStoredImages();
-            $article->update(['featured_image' => $request->file('featured_image')->store('articles', 'public')]);
-        } elseif ($request->boolean('remove_featured_image')) {
-            $article->deleteStoredImages();
-            $article->update(['featured_image' => null]);
+        if ($request->boolean('remove_featured_image')) {
+            $validated['remove_featured_image'] = true;
         }
+
+        $this->articleService->update($article, $validated, $request->file('featured_image'));
 
         if (isset($validated['staff_ids'])) {
             $article->staffs()->sync($validated['staff_ids']);
-            $article->staff_id = !empty($validated['staff_ids']) ? $validated['staff_ids'][0] : null;
-            $article->save();
-        }
-
-        if (!empty($validated['tags'])) {
-            $article->tags()->delete();
-            $tags = explode(',', $validated['tags']);
-            foreach ($tags as $tag) {
-                ArticleTag::create([
-                    'article_id' => $article->id,
-                    'tag' => trim($tag),
-                ]);
-            }
         }
 
         $this->clearHomepageCache();

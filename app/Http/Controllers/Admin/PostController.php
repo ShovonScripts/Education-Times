@@ -19,7 +19,8 @@ class PostController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Article::with(['author', 'category', 'staff', 'staffs']);
+        $query = Article::with(['author', 'category', 'staffs'])
+            ->withSum('viewCounts', 'views');
 
         $query->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->when($request->filled('category_id'), fn($q) => $q->where('category_id', $request->category_id))
@@ -62,7 +63,7 @@ class PostController extends Controller
     public function pending(): View
     {
         $articles = Article::where('status', 'submitted')
-            ->with(['author', 'category', 'staff', 'staffs'])
+            ->with(['author', 'category', 'staffs'])
             ->latest()
             ->paginate(25);
 
@@ -165,7 +166,7 @@ class PostController extends Controller
         $this->clearHomepageCache();
 
         $labels = ['published' => 'Published', 'draft' => 'Draft', 'submitted' => 'Pending Review', 'archived' => 'আর্কাইভ'];
-        return back()->with('success', "Status '{$labels[$request->status]}' এ পরিবর্তন করা হয়েছে!");
+        return back()->with('success', "অবস্থা '{$labels[$request->status]}' এ পরিবর্তন করা হয়েছে!");
     }
 
     public function updateSliderOrder(Request $request): JsonResponse
@@ -216,6 +217,6 @@ class PostController extends Controller
 
         $this->clearHomepageCache();
 
-        return back()->with('success', 'বাল্ক Action সম্পন্ন!');
+        return back()->with('success', 'বাল্ক কার্যক্রম সম্পন্ন হয়েছে!');
     }
 }

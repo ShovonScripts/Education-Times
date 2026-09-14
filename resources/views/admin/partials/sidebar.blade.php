@@ -1,6 +1,12 @@
 <aside id="adminSidebar" class="w-56 bg-[#0d0d0d] dark:bg-[#0a0a0a] text-white hidden md:flex flex-col shrink-0 overflow-y-auto border-r border-white/5">
     <div class="h-14 flex items-center px-5 border-b border-white/10 shrink-0">
-        <a href="{{ route('admin.dashboard') }}" class="font-serif font-bold text-lg tracking-tight">ET <span class="text-[#E02020] font-bold">Admin</span></a>
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 shrink-0">
+            @if($siteLogo = \App\Models\Setting::get('site_logo'))
+                <img src="{{ Storage::url($siteLogo) }}" alt="{{ \App\Models\Setting::get('site_name_bn', config('app.name')) }}" class="h-8 w-auto">
+            @else
+                <span class="font-serif font-bold text-lg tracking-tight text-white">ET <span class="text-[#E02020] font-bold">Admin</span></span>
+            @endif
+        </a>
     </div>
     <nav class="flex-1 py-5 px-3 space-y-0.5 text-sm">
 
@@ -122,6 +128,11 @@
         <a href="{{ route('admin.ads.index') }}" class="sidebar-link @if(request()->routeIs('admin.ads.*')) active @endif">
             <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
             <span>Advertisements</span>
+        </a>
+
+        <a href="{{ route('admin.partners.index') }}" class="sidebar-link @if(request()->routeIs('admin.partners.*')) active @endif">
+            <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Partners</span>
         </a>
 
         <a href="{{ route('admin.newsletter.index') }}" class="sidebar-link @if(request()->routeIs('admin.newsletter.*')) active @endif">

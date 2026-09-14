@@ -2,6 +2,18 @@
 
 @section('title', $category->name_bn . ' — ' . config('app.name'))
 @section('meta_description', $category->description ?? ($category->name_bn . ' বিভাগের সর্বশেষ সংবাদ'))
+@section('canonical', route('article.category', $category->slug))
+@section('structured_data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": {!! json_encode($category->name_bn) !!},
+    "description": {!! json_encode($category->description ?? $category->name_bn . ' বিভাগের সর্বশেষ সংবাদ') !!},
+    "url": {!! json_encode(route('article.category', $category->slug)) !!}
+}
+</script>
+@endsection
 
 @section('content')
 <div class="max-w-[1240px] mx-auto px-4 py-6">

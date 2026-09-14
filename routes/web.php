@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
@@ -29,8 +30,8 @@ use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\StaffArticleController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -39,32 +40,37 @@ Route::get('/category/{slug}', [ArticleController::class, 'category'])->name('ar
 Route::get('/archive', [ArchiveController::class, 'index'])->name('archive.index');
 Route::get('/news', [\App\Http\Controllers\NewsController::class, 'index'])->name('news.index');
 Route::get('/videos', [\App\Http\Controllers\VideoController::class, 'index'])->name('videos.index');
-Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:30,1')->name('search.index');
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 Route::get('/staff/{staff}/articles', [StaffController::class, 'articles'])->name('staff.articles');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SeoController::class, 'showRobotsTxt'])->name('robots.txt');
-Route::get('/ads/click/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'click'])->name('admin.ads.click');
-Route::get('/ads/impression/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'impression'])->name('admin.ads.impression');
+Route::get('/ads/click/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'click'])->middleware('throttle:30,1')->name('admin.ads.click');
+Route::get('/ads/impression/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'impression'])->middleware('throttle:30,1')->name('admin.ads.impression');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+    Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1')->name('contact.store');
 
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->middleware('throttle:10,1')->name('newsletter.subscribe');
 
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/terms-and-conditions', [PageController::class, 'terms'])->name('pages.terms');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.attempt');
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:5,1')->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:5,1')->name('password.update');
     Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('google.login');
     Route::get('/auth/google/callback', [SocialiteController::class, 'callback'])->name('google.callback');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminAuthController::class, 'showLoginForm'])->name('login');
+        Route::get('/login', [AdminAuthController::class, 'showLoginForm']);
         Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('login.attempt');
     });
 });
@@ -76,24 +82,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/like/{article}', [LikeController::class, 'toggle'])->name('profile.like.toggle');
+    Route::post('/articles/{article}/save', [\App\Http\Controllers\SaveController::class, 'toggle'])->name('article.save.toggle');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/logout-admin', [AdminAuthController::class, 'logout'])->name('admin.logout');
     Route::post('/comments', [UserCommentController::class, 'store'])->middleware('throttle:10,1')->name('comments.store');
-
-    Route::get('/email/verify', function () {
-        return view('auth.verify-email');
-    })->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-        return redirect()->route('dashboard')->with('success', 'ইমেইল ভেরিফিকেশন সফল!');
-    })->middleware('signed')->name('verification.verify');
-    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
-        $request->user()->sendEmailVerificationNotification();
-        return back()->with('success', 'ভেরিফিকেশন ইমেইল আবার পাঠানো হয়েছে।');
-    })->name('verification.send');
 });
 
-Route::middleware(['auth', 'admin'])->prefix('staff')->name('staff.')->group(function () {
+Route::middleware(['auth', 'staff'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/articles', [StaffArticleController::class, 'index'])->name('articles.index');
     Route::get('/articles/create', [StaffArticleController::class, 'create'])->name('articles.create');
     Route::post('/articles', [StaffArticleController::class, 'store'])->name('articles.store');
@@ -197,4 +192,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/newsletter', [NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
     Route::post('/newsletter/{subscriber}/toggle-active', [NewsletterSubscriberController::class, 'toggleActive'])->name('newsletter.toggle-active');
     Route::delete('/newsletter/{subscriber}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter.destroy');
+
+    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
+    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
+    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
+    Route::get('/partners/{partner}/edit', [PartnerController::class, 'edit'])->name('partners.edit');
+    Route::put('/partners/{partner}', [PartnerController::class, 'update'])->name('partners.update');
+    Route::delete('/partners/{partner}', [PartnerController::class, 'destroy'])->name('partners.destroy');
 });

@@ -19,14 +19,14 @@
                 <a href="{{ route('profile.edit') }}" class="border border-[#111] text-[#111] hover:bg-[#111] hover:text-white text-sm font-semibold uppercase tracking-wider px-4 py-2 transition">প্রোফাইল সম্পাদনা</a>
             </div>
 
-            <div x-data="{ tab: 'profile' }">
+            <div id="profileTabs">
                 <div class="flex border-b-2 border-[#111] mb-6">
-                    <button @click="tab = 'profile'" :class="{ 'border-b-2 border-[#111] text-[#111] font-semibold bg-[#111] text-white': tab === 'profile' }" class="px-5 py-3 text-sm text-[#666] hover:text-[#111] transition">প্রোফাইল</button>
-                    <button @click="tab = 'comments'" :class="{ 'border-b-2 border-[#111] text-[#111] font-semibold bg-[#111] text-white': tab === 'comments' }" class="px-5 py-3 text-sm text-[#666] hover:text-[#111] transition">মন্তব্য</button>
-                    <button @click="tab = 'liked'" :class="{ 'border-b-2 border-[#111] text-[#111] font-semibold bg-[#111] text-white': tab === 'liked' }" class="px-5 py-3 text-sm text-[#666] hover:text-[#111] transition">পছন্দ করা</button>
+                    <button type="button" data-tab="profile" class="profile-tab px-5 py-3 text-sm font-semibold border-b-2 border-[#111] text-white bg-[#111] transition">প্রোফাইল</button>
+                    <button type="button" data-tab="comments" class="profile-tab px-5 py-3 text-sm text-[#666] hover:text-[#111] transition">মন্তব্য</button>
+                    <button type="button" data-tab="liked" class="profile-tab px-5 py-3 text-sm text-[#666] hover:text-[#111] transition">পছন্দ করা</button>
                 </div>
 
-                <div x-show="tab === 'profile'" x-cloak>
+                <div data-panel="profile">
                     <div class="bg-white border border-[#e5e5e5] p-6">
                         <h2 class="font-serif font-black text-lg mb-6 border-l-4 border-[#111] pl-3 text-[#111]">ব্যক্তিগত তথ্য</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
 
-                <div x-show="tab === 'comments'" x-cloak>
+                <div data-panel="comments" class="hidden">
                     <div class="bg-white border border-[#e5e5e5] p-6">
                         <h2 class="font-serif font-black text-lg mb-4 border-l-4 border-[#111] pl-3 text-[#111]">আমার মন্তব্য</h2>
                         @if(isset($comments) && $comments->isNotEmpty())
@@ -74,7 +74,7 @@
                     </div>
                 </div>
 
-                <div x-show="tab === 'liked'" x-cloak>
+                <div data-panel="liked" class="hidden">
                     <div class="bg-white border border-[#e5e5e5] p-6">
                         <h2 class="font-serif font-black text-lg mb-4 border-l-4 border-[#111] pl-3 text-[#111]">পছন্দ করা সংবাদ</h2>
                         @if(isset($likedArticles) && $likedArticles->isNotEmpty())
@@ -96,3 +96,30 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    var root = document.getElementById('profileTabs');
+    if (!root) return;
+    var tabs = root.querySelectorAll('.profile-tab');
+    var panels = root.querySelectorAll('[data-panel]');
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            tabs.forEach(function(t) {
+                var active = t === tab;
+                t.classList.toggle('bg-[#111]', active);
+                t.classList.toggle('text-white', active);
+                t.classList.toggle('border-b-2', active);
+                t.classList.toggle('border-[#111]', active);
+                t.classList.toggle('font-semibold', active);
+                t.classList.toggle('text-[#666]', !active);
+            });
+            panels.forEach(function(p) {
+                p.classList.toggle('hidden', p.dataset.panel !== tab.dataset.tab);
+            });
+        });
+    });
+})();
+</script>
+@endpush

@@ -22,6 +22,10 @@ class SocialiteController extends Controller
         $user = User::where('google_id', $googleUser->id)->first();
 
         if ($user) {
+            if (!$user->is_active) {
+                Auth::logout();
+                return redirect()->route('login')->withErrors(['email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।']);
+            }
             Auth::login($user);
             return $this->redirectToDashboard($user);
         }
@@ -29,6 +33,10 @@ class SocialiteController extends Controller
         $existingUser = User::where('email', $googleUser->email)->first();
 
         if ($existingUser) {
+            if (!$existingUser->is_active) {
+                Auth::logout();
+                return redirect()->route('login')->withErrors(['email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।']);
+            }
             $existingUser->update([
                 'google_id' => $googleUser->id,
                 'avatar' => $googleUser->avatar,

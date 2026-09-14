@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use App\Models\ArticleTag;
 use App\Models\Category;
 use App\Services\ArticleService;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use function Clean;
 
 class DashboardController extends Controller
 {
@@ -70,39 +70,17 @@ class DashboardController extends Controller
             'category_id' => 'required|exists:categories,id',
             'body_bn' => 'required|string',
             'excerpt_bn' => 'nullable|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             'tags' => 'nullable|string',
         ]);
 
-        $slug = Str::slug($validated['title_bn']);
-        if (empty($slug)) {
-            $slug = 'post-' . Str::random(8);
-        }
-        $slug .= '-' . Str::random(4);
-
-        $validated['slug'] = $slug;
+        $validated['slug'] = $this->articleService->generateUniqueSlug($validated['title_bn']);
         $validated['author_id'] = Auth::id();
         $validated['status'] = 'submitted';
+        $validated['body_bn'] = clean($validated['body_bn']);
         $validated['reading_time_minutes'] = $this->articleService->calculateReadingTime($validated['body_bn']);
 
-        if ($request->hasFile('featured_image')) {
-            $validated['featured_image'] = $request->file('featured_image')
-                ->store('articles', 'public');
-        } else {
-            $validated['featured_image'] = null;
-        }
-
-        $article = Article::create($validated);
-
-        if (!empty($validated['tags'])) {
-            $tags = explode(',', $validated['tags']);
-            foreach ($tags as $tag) {
-                ArticleTag::create([
-                    'article_id' => $article->id,
-                    'tag' => trim($tag),
-                ]);
-            }
-        }
+        $article = $this->articleService->create($validated, $request->file('featured_image'));
 
         return redirect()->route('dashboard')
             ->with('success', 'আপনার পোস্ট জমা দেওয়া হয়েছে! পর্যালোচনার পর তা প্রকাশ করা হবে।');

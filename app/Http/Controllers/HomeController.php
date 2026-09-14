@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ArticleStatus;
 use App\Models\Article;
 use App\Models\ArticleTag;
+use App\Models\ArticleViewCount;
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Setting;
-use App\Models\PageView;
-use App\Enums\ArticleStatus;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class HomeController extends Controller
 {
@@ -23,8 +25,8 @@ class HomeController extends Controller
             foreach ($activeCategories as $category) {
                 $category->articles = Article::where('status', ArticleStatus::PUBLISHED->value)
                     ->where('category_id', $category->id)
-                    ->select('id', 'category_id', 'title_bn', 'slug', 'excerpt_bn', 'body_bn', 'featured_image', 'video_url', 'is_editor_pick', 'published_at')
-                    ->with('staffs:id,name_bn')
+                    ->select('id', 'category_id', 'title_bn', 'slug', 'excerpt_bn', 'featured_image', 'video_url', 'is_editor_pick', 'published_at')
+                    ->with(['staffs:id,name_bn', 'category:id,name_bn,slug'])
                     ->latest('published_at')
                     ->take(4)
                     ->get();
@@ -77,17 +79,17 @@ class HomeController extends Controller
         $breakingStories = Cache::remember('home_breaking_stories', 60, function () {
             return Article::where('status', ArticleStatus::PUBLISHED->value)
                 ->where('is_breaking', true)
+                ->with(['category', 'staffs'])
                 ->latest('published_at')
                 ->take(5)
                 ->get();
         });
 
         $mostRead = Cache::remember('home_most_read', 3600, function () {
-            // Cache most read for longer (1 hour) as it requires table scan
             return Article::where('status', ArticleStatus::PUBLISHED->value)
                 ->with(['category', 'staffs'])
-                ->withCount('pageViews')
-                ->orderBy('page_views_count', 'desc')
+                ->withSum('viewCounts', 'views')
+                ->orderByDesc('view_counts_sum_views')
                 ->take(5)
                 ->get();
         });
@@ -96,7 +98,7 @@ class HomeController extends Controller
             return Article::where('status', ArticleStatus::PUBLISHED->value)
                 ->where('is_editor_pick', true)
                 ->where('id', '!=', $leadStory?->id)
-                ->with(['staffs'])
+                ->with(['category', 'staffs'])
                 ->latest('published_at')
                 ->take(4)
                 ->get();

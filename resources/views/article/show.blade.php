@@ -2,6 +2,58 @@
 
 @section('title', $article->meta_title ?? $article->title_bn . ' — ' . config('app.name'))
 @section('meta_description', $article->meta_description ?? Str::limit(strip_tags($article->excerpt_bn ?? $article->body_bn), 160))
+@if(!$article->indexable)
+    @push('meta')
+    <meta name="robots" content="noindex, nofollow">
+    @endpush
+@endif
+@if($article->canonical_url)
+    @section('canonical', $article->canonical_url)
+@endif
+@if($article->og_image || $article->featured_image)
+    @php
+        $ogImage = $article->og_image ?? $article->featured_image;
+        $ogImageUrl = \Illuminate\Support\Str::startsWith($ogImage, ['http://', 'https://', 'data:'])
+            ? $ogImage
+            : \Illuminate\Support\Facades\Storage::url($ogImage);
+    @endphp
+    @section('og_image', $ogImageUrl)
+@endif
+
+@php
+    $imageUrl = $article->featured_image
+        ? (\Illuminate\Support\Str::startsWith($article->featured_image, ['http://', 'https://', 'data:'])
+            ? $article->featured_image
+            : \Illuminate\Support\Facades\Storage::url($article->featured_image))
+        : null;
+@endphp
+@section('structured_data')
+@if($article->published_at && $imageUrl)
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": {!! json_encode($article->title_bn) !!},
+    "description": {!! json_encode(Str::limit(strip_tags($article->excerpt_bn ?? $article->body_bn), 160)) !!},
+    "image": {!! json_encode($imageUrl) !!},
+    "datePublished": {!! json_encode($article->published_at->toIso8601String()) !!},
+    "dateModified": {!! json_encode($article->updated_at->toIso8601String()) !!},
+    "author": {
+        "@type": "Person",
+        "name": {!! json_encode($article->author->name ?? config('app.name')) !!}
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": {!! json_encode(config('app.name')) !!},
+        "logo": {
+            "@type": "ImageObject",
+            "url": {!! json_encode(asset('favicon.ico')) !!}
+        }
+    }
+}
+</script>
+@endif
+@endsection
 
 @section('content')
 
@@ -62,7 +114,7 @@
                     <div>
                         <p class="text-sm font-semibold text-[#111]">
                             @if($article->staffs->isNotEmpty())
-                            <a href="#" class="hover:text-[#E02020] transition-colors">{{ $article->staffs->first()->name_bn }}</a>
+                            <a href="{{ route('staff.articles', $article->staffs->first()) }}" class="hover:text-[#E02020] transition-colors">{{ $article->staffs->first()->name_bn }}</a>
                             <span class="text-[#999] font-normal text-xs block">{{ $article->staffs->first()->designation_bn ?? 'প্রতিবেদক' }}</span>
                             @elseif($article->author)
                             {{ $article->author->name }}
@@ -73,7 +125,23 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#999] mr-1">শেয়ার:</span>
+                    @php
+                        $canInteract = auth()->check();
+                        $likeCount = $article->likedByUsers()->count();
+                    @endphp
+                    {{-- Like --}}
+                    <button type="button" id="likeBtn" data-url="{{ route('profile.like.toggle', $article) }}" data-auth="{{ $canInteract ? 1 : 0 }}"
+                            class="flex items-center gap-1.5 h-8 px-3 rounded-full bg-[#f0f0f0] text-[#555] hover:bg-[#E02020] hover:text-white transition-all duration-200 {{ $liked ? 'bg-[#E02020] text-white' : '' }}" title="পছন্দ করুন">
+                        <svg class="h-3.5 w-3.5" fill="{{ $liked ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        <span id="likeCount" class="text-xs font-semibold">{{ $likeCount }}</span>
+                    </button>
+                    {{-- Save --}}
+                    <button type="button" id="saveBtn" data-url="{{ route('article.save.toggle', $article) }}" data-auth="{{ $canInteract ? 1 : 0 }}"
+                            class="flex items-center gap-1.5 h-8 px-3 rounded-full bg-[#f0f0f0] text-[#555] hover:bg-[#111] hover:text-white transition-all duration-200 {{ $saved ? 'bg-[#111] text-white' : '' }}" title="পরে পড়ার জন্য সংরক্ষণ করুন">
+                        <svg class="h-3.5 w-3.5" fill="{{ $saved ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        <span id="saveLabel" class="text-xs font-semibold">{{ $saved ? 'সংরক্ষিত' : 'সংরক্ষণ' }}</span>
+                    </button>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-[#999] mr-1 ml-2">শেয়ার:</span>
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" rel="noopener" class="w-8 h-8 rounded-full bg-[#f0f0f0] text-[#555] hover:bg-[#1877F2] hover:text-white flex items-center justify-center transition-all duration-200" title="Facebook">
                         <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     </a>
@@ -133,6 +201,78 @@
             </div>
             @endif
 
+            {{-- Comments Section --}}
+            <section class="mt-10 border-t-2 border-[#111] pt-8">
+                <h2 class="font-serif font-black text-xl text-[#111] mb-6">মন্তব্য</h2>
+
+                @if(session('success'))
+                <div class="mb-6 border-l-4 border-[#111] bg-[#f5f5f5] px-4 py-3 text-sm">{{ session('success') }}</div>
+                @endif
+
+                @if(isset($comments) && $comments->isNotEmpty())
+                <div class="space-y-6 mb-8">
+                    @foreach($comments as $comment)
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#111] text-white flex items-center justify-center font-serif font-bold text-sm shrink-0">
+                            {{ mb_substr($comment->user->name ?? 'অ', 0, 1) }}
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-[#f5f5f5] p-4">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-sm font-semibold text-[#111]">{{ $comment->user->name ?? 'অনাম্য' }}</span>
+                                    <span class="text-xs text-[#999]">{{ $comment->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-sm text-[#444] leading-relaxed">{{ $comment->body }}</p>
+                            </div>
+                            @if($comment->replies->isNotEmpty())
+                            <div class="mt-3 ml-4 space-y-3">
+                                @foreach($comment->replies as $reply)
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-[#e5e5e5] text-[#111] flex items-center justify-center font-serif font-bold text-xs shrink-0">
+                                        {{ mb_substr($reply->user->name ?? 'অ', 0, 1) }}
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="bg-white border border-[#e5e5e5] p-3">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="text-xs font-semibold text-[#111]">{{ $reply->user->name ?? 'অনাম্য' }}</span>
+                                                <span class="text-xs text-[#999]">{{ $reply->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="text-sm text-[#444] leading-relaxed">{{ $reply->body }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <p class="text-sm text-[#666] mb-6">এখনো কোনো মন্তব্য নেই। প্রথম মন্তব্যকারী হন!</p>
+                @endif
+
+                @auth
+                <div class="bg-white border border-[#e5e5e5] p-6">
+                    <h3 class="font-serif font-black text-lg text-[#111] mb-4">মন্তব্য লিখুন</h3>
+                    <form method="POST" action="{{ route('comments.store') }}" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="article_id" value="{{ $article->id }}">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-[#111] mb-1.5">আপনার মন্তব্য</label>
+                            <textarea name="body" rows="4" required class="w-full border border-[#e5e5e5] focus:border-[#111] focus:outline-none focus:ring-1 focus:ring-[#111] px-3 py-2.5 text-sm resize-y"></textarea>
+                        </div>
+                        <button type="submit" class="bg-[#111] hover:bg-black text-white text-sm font-semibold uppercase tracking-wider py-2.5 px-6 transition">মন্তব্য পোস্ট করুন</button>
+                    </form>
+                </div>
+                @else
+                <div class="bg-[#f5f5f5] border border-[#e5e5e5] p-6 text-center">
+                    <p class="text-sm text-[#666] mb-3">মন্তব্য করতে লগইন করুন</p>
+                    <a href="{{ route('login') }}" class="inline-block bg-[#111] hover:bg-black text-white text-sm font-semibold uppercase tracking-wider py-2.5 px-6 transition">লগইন করুন</a>
+                </div>
+                @endauth
+            </section>
+
             {{-- Related Articles --}}
             @if(isset($related) && $related->isNotEmpty())
             <section class="mt-10">
@@ -181,10 +321,53 @@
                 </ul>
             </section>
             @endif
-
-            @include('partials.ads.sidebar')
         </aside>
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+(function() {
+    function wire(btn, onDone) {
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            if (btn.dataset.auth !== '1') {
+                window.location.href = '{{ route('login') }}';
+                return;
+            }
+            btn.disabled = true;
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { btn.disabled = false; onDone(btn, data); })
+            .catch(function() { btn.disabled = false; });
+        });
+    }
+
+    wire(document.getElementById('likeBtn'), function(btn, data) {
+        var count = document.getElementById('likeCount');
+        var svg = btn.querySelector('svg');
+        count.textContent = data.count;
+        btn.classList.toggle('bg-[#E02020]', data.liked);
+        btn.classList.toggle('text-white', data.liked);
+        svg.setAttribute('fill', data.liked ? 'currentColor' : 'none');
+    });
+
+    wire(document.getElementById('saveBtn'), function(btn, data) {
+        var label = document.getElementById('saveLabel');
+        var svg = btn.querySelector('svg');
+        label.textContent = data.saved ? 'সংরক্ষিত' : 'সংরক্ষণ';
+        btn.classList.toggle('bg-[#111]', data.saved);
+        btn.classList.toggle('text-white', data.saved);
+        svg.setAttribute('fill', data.saved ? 'currentColor' : 'none');
+    });
+})();
+</script>
+@endpush
