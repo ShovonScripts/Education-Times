@@ -105,7 +105,7 @@
                 </div>
                 <div class="flex items-center gap-3 shrink-0 ml-3">
                     <span class="text-xs px-1.5 py-0.5 {{ match($article->status) { 'published' => 'badge-published', 'scheduled' => 'badge-scheduled', default => 'badge-draft' } }}">
-                        {{ $article->status === 'published' ? 'Published' : ($article->status === 'scheduled' ? 'Scheduled' : 'Draft') }}
+                        {{ $article->status?->value === 'published' ? 'Published' : ($article->status?->value === 'scheduled' ? 'Scheduled' : 'Draft') }}
                     </span>
                     <span class="text-xs text-[#999] dark:text-[#777]">{{ $article->created_at->format('d/m') }}</span>
                 </div>

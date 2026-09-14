@@ -40,7 +40,7 @@
                     <td class="p-3 text-[#666] text-xs">{{ $article->staffs->map(fn($s) => $s->name_bn)->join(', ') ?: $article->author?->name }}</td>
                     <td class="p-3">
                         <span class="badge-{{ $article->status }}">
-                            {{ $article->status === 'published' ? 'Published' : ($article->status === 'submitted' ? 'Pending Review' : ($article->status === 'scheduled' ? 'Scheduled' : 'Draft')) }}
+                            {{ $article->status?->value === 'published' ? 'Published' : ($article->status?->value === 'submitted' ? 'Pending Review' : ($article->status?->value === 'scheduled' ? 'Scheduled' : 'Draft')) }}
                         </span>
                     </td>
                     <td class="p-3 text-[#666] text-xs">{{ $article->published_at?->format('d/m/Y H:i') ?? $article->created_at->format('d/m/Y') }}</td>

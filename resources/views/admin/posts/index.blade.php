@@ -126,17 +126,17 @@
                 <td class="p-3">
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full inline-block
-                            @if($article->status === 'published') bg-green-500
-                            @elseif($article->status === 'submitted') bg-yellow-500
-                            @elseif($article->status === 'scheduled') bg-blue-500
+                            @if($article->status?->value === 'published') bg-green-500
+                            @elseif($article->status?->value === 'submitted') bg-yellow-500
+                            @elseif($article->status?->value === 'scheduled') bg-blue-500
                             @else bg-gray-400 @endif">
                         </span>
                         <span class="text-xs
-                            @if($article->status === 'published') text-green-700
-                            @elseif($article->status === 'submitted') text-yellow-700
-                            @elseif($article->status === 'scheduled') text-blue-700
+                            @if($article->status?->value === 'published') text-green-700
+                            @elseif($article->status?->value === 'submitted') text-yellow-700
+                            @elseif($article->status?->value === 'scheduled') text-blue-700
                             @else text-[#666] @endif">
-                            {{ $article->status === 'published' ? 'Published' : ($article->status === 'submitted' ? 'Pending Review' : ($article->status === 'scheduled' ? 'Scheduled' : 'Draft')) }}
+                            {{ $article->status?->value === 'published' ? 'Published' : ($article->status?->value === 'submitted' ? 'Pending Review' : ($article->status?->value === 'scheduled' ? 'Scheduled' : 'Draft')) }}
                         </span>
                     </div>
                 </td>

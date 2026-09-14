@@ -153,7 +153,7 @@
                             <tr class="hover:bg-[#fafafa] dark:hover:bg-[#2a2a2a]">
                                 <td class="p-3">
                                     <a href="{{ route('article.show', $article->slug) }}"
-                                        class="text-sm font-medium dark:text-white hover:text-[#E02020] dark:hover:text-[#ff6b6b] transition line-clamp-1 {{ $article->status === 'draft' ? 'text-[#999] dark:text-[#777]' : '' }}">
+                                        class="text-sm font-medium dark:text-white hover:text-[#E02020] dark:hover:text-[#ff6b6b] transition line-clamp-1 {{ $article->status?->value === 'draft' ? 'text-[#999] dark:text-[#777]' : '' }}">
                                         {{ Str::limit($article->title_bn, 50) }}
                                     </a>
                                 </td>

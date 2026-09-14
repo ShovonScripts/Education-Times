@@ -24,11 +24,11 @@
                 <td class="p-3 text-[#666] dark:text-[#999]">{{ $article->category?->name_bn }}</td>
                 <td class="p-3">
                     <span class="text-xs px-2 py-0.5
-                        @if($article->status === 'published') bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400
-                        @elseif($article->status === 'submitted') bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400
-                        @elseif($article->status === 'scheduled') bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400
+                        @if($article->status?->value === 'published') bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400
+                        @elseif($article->status?->value === 'submitted') bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400
+                        @elseif($article->status?->value === 'scheduled') bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400
                         @else bg-gray-100 dark:bg-gray-800 text-[#666] dark:text-[#999] @endif">
-                        {{ $article->status === 'published' ? 'প্রকাশিত' : ($article->status === 'submitted' ? 'পর্যালোচনায়' : ($article->status === 'scheduled' ? 'নির্ধারিত' : 'খসড়া')) }}
+                        {{ $article->status?->value === 'published' ? 'প্রকাশিত' : ($article->status?->value === 'submitted' ? 'পর্যালোচনায়' : ($article->status?->value === 'scheduled' ? 'নির্ধারিত' : 'খসড়া')) }}
                     </span>
                 </td>
                 <td class="p-3 text-[#666] dark:text-[#999] text-xs">{{ $article->updated_at->format('d/m/Y') }}</td>
