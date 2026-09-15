@@ -61,6 +61,7 @@ class SettingController extends Controller
             'social_whatsapp' => 'nullable|string|max:50',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords' => 'nullable|string|max:500',
+            'default_og_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'google_analytics_id' => 'nullable|string|max:50',
             'google_tag_manager_id' => 'nullable|string|max:50',
             'maintenance_mode' => 'nullable|in:0,1',
@@ -88,7 +89,7 @@ class SettingController extends Controller
         $validated = $request->validate($rules);
 
         foreach ($validated as $key => $value) {
-            if (in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader']) && $request->hasFile($key)) {
+            if (in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader', 'default_og_image']) && $request->hasFile($key)) {
                 $old = Setting::get($key);
                 if ($old && !preg_match('#^(https?:)?//|data:#i', (string) $old)) {
                     Storage::disk('public')->delete((string) $old);
@@ -96,7 +97,7 @@ class SettingController extends Controller
                 $file = $request->file($key);
                 $path = $file->store('settings', 'public');
                 Setting::set($key, $path);
-            } elseif (!in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader'])) {
+            } elseif (!in_array($key, ['site_logo', 'site_footer_logo', 'site_favicon', 'site_loader', 'default_og_image'])) {
                 Setting::set($key, $value ?? '');
             }
         }

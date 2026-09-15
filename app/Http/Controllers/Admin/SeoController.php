@@ -129,13 +129,14 @@ class SeoController extends Controller
     public function sitemap(): \Illuminate\Http\Response
     {
         $xml = Cache::remember('sitemap_xml', 3600, function () {
+            $siteName = config('app.name');
             $urls = ['<?xml version="1.0" encoding="UTF-8"?>'];
             $urls[] = '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
-            $urls[] = '<url><loc>' . url('/') . '</loc><priority>1.0</priority><changefreq>hourly</changefreq></url>';
+            $urls[] = '<url><loc>' . url('/') . '</loc><lastmod>' . now()->toIso8601String() . '</lastmod><priority>1.0</priority><changefreq>hourly</changefreq></url>';
 
-            $categories = Category::where('is_active', true)->get(['slug']);
+            $categories = Category::where('is_active', true)->get(['slug', 'updated_at']);
             foreach ($categories as $cat) {
-                $urls[] = '<url><loc>' . url('/category/' . $cat->slug) . '</loc><priority>0.8</priority><changefreq>daily</changefreq></url>';
+                $urls[] = '<url><loc>' . url('/category/' . $cat->slug) . '</loc><lastmod>' . $cat->updated_at->toIso8601String() . '</lastmod><priority>0.8</priority><changefreq>daily</changefreq></url>';
             }
 
             Article::where('status', 'published')
@@ -143,17 +144,24 @@ class SeoController extends Controller
                 ->whereNotNull('published_at')
                 ->select('slug', 'title_bn', 'published_at', 'updated_at')
                 ->orderByDesc('published_at')
-                ->chunk(1000, function ($articles) use (&$urls) {
+                ->chunk(1000, function ($articles) use (&$urls, $siteName) {
                     foreach ($articles as $article) {
                         $urls[] = '<url>';
                         $urls[] = '<loc>' . url('/news/' . $article->slug) . '</loc>';
                         $urls[] = '<lastmod>' . $article->updated_at->toIso8601String() . '</lastmod>';
                         $urls[] = '<priority>0.9</priority>';
                         $urls[] = '<changefreq>daily</changefreq>';
-                        $urls[] = '<news:news>';
-                        $urls[] = '<news:publication_date>' . $article->published_at?->toIso8601String() . '</news:publication_date>';
-                        $urls[] = '<news:title>' . htmlspecialchars($article->title_bn, ENT_XML1, 'UTF-8') . '</news:title>';
-                        $urls[] = '</news:news>';
+                        // Google News extension entries are only valid for articles younger than 2 days
+                        if ($article->published_at->greaterThan(now()->subDays(2))) {
+                            $urls[] = '<news:news>';
+                            $urls[] = '<news:publication>';
+                            $urls[] = '<news:name>' . htmlspecialchars($siteName, ENT_XML1, 'UTF-8') . '</news:name>';
+                            $urls[] = '<news:language>bn</news:language>';
+                            $urls[] = '</news:publication>';
+                            $urls[] = '<news:publication_date>' . $article->published_at->toIso8601String() . '</news:publication_date>';
+                            $urls[] = '<news:title>' . htmlspecialchars($article->title_bn, ENT_XML1, 'UTF-8') . '</news:title>';
+                            $urls[] = '</news:news>';
+                        }
                         $urls[] = '</url>';
                     }
                 });
@@ -166,9 +174,11 @@ class SeoController extends Controller
         return response($xml)->header('Content-Type', 'application/xml');
     }
 
+    private const DEFAULT_ROBOTS = "User-agent: *\nDisallow: /login\nDisallow: /register\nDisallow: /logout\nDisallow: /search\nDisallow: /dashboard\nDisallow: /profile\nDisallow: /forgot-password\nDisallow: /reset-password\nDisallow: /auth/\nDisallow: /admin\n\nSitemap: ";
+
     public function robotsEditor(): View
     {
-        $robots = Setting::get('robots_txt', "User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'));
+        $robots = Setting::get('robots_txt', self::DEFAULT_ROBOTS . url('/sitemap.xml'));
         return view('admin.seo.robots', compact('robots'));
     }
 
@@ -181,7 +191,7 @@ class SeoController extends Controller
 
     public function showRobotsTxt(): \Illuminate\Http\Response
     {
-        $robots = Setting::get('robots_txt', "User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'));
+        $robots = Setting::get('robots_txt', self::DEFAULT_ROBOTS . url('/sitemap.xml'));
         return response($robots)->header('Content-Type', 'text/plain');
     }
 

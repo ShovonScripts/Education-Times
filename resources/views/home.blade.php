@@ -2,6 +2,7 @@
 
 @section('title', config('app.name') . ' — শিক্ষার সব খবর এক নজরে')
 @section('meta_description', 'Education Times — বাংলাদেশের শিক্ষা সংবাদের বিশ্বস্ত পোর্টাল। শিক্ষা নীতিমালা, পরীক্ষা, ভর্তি, ক্যারিয়ার ও শিক্ষা বিষয়ক সর্বশেষ খবর।')
+@section('canonical', route('home'))
 @section('structured_data')
 <script type="application/ld+json">
 {

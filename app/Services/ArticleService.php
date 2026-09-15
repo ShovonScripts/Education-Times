@@ -53,7 +53,12 @@ class ArticleService
         $img->scaleDown(width: 1200);
         $filename = uniqid() . '.webp';
         $path = 'articles/' . $filename;
-        $img->toWebp(82)->save(storage_path('app/public/' . $path));
+
+        // Storage::put() creates missing directories automatically — unlike
+        // Intervention's save(), which fails when articles/ doesn't exist yet.
+        \Illuminate\Support\Facades\Storage::disk('public')
+            ->put($path, (string) $img->toWebp(82));
+
         return $path;
     }
 

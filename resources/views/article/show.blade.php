@@ -2,33 +2,37 @@
 
 @section('title', $article->meta_title ?? $article->title_bn . ' — ' . config('app.name'))
 @section('meta_description', $article->meta_description ?? Str::limit(strip_tags($article->excerpt_bn ?? $article->body_bn), 160))
-@if(!$article->indexable)
+@section('og_type', 'article')
+@unless($article->indexable)
     @push('meta')
     <meta name="robots" content="noindex, nofollow">
     @endpush
-@endif
-@if($article->canonical_url)
-    @section('canonical', $article->canonical_url)
-@endif
-@if($article->og_image || $article->featured_image)
-    @php
-        $ogImage = $article->og_image ?? $article->featured_image;
-        $ogImageUrl = \Illuminate\Support\Str::startsWith($ogImage, ['http://', 'https://', 'data:'])
-            ? $ogImage
-            : \Illuminate\Support\Facades\Storage::url($ogImage);
-    @endphp
-    @section('og_image', $ogImageUrl)
-@endif
-
+@endunless
+@section('canonical', $article->canonical_url ?: route('article.show', $article->slug))
 @php
-    $imageUrl = $article->featured_image
-        ? (\Illuminate\Support\Str::startsWith($article->featured_image, ['http://', 'https://', 'data:'])
-            ? $article->featured_image
-            : \Illuminate\Support\Facades\Storage::url($article->featured_image))
-        : null;
+    $imageUrl = null;
+    foreach ([$article->og_image, $article->featured_image] as $candidate) {
+        if ($candidate) {
+            $imageUrl = \Illuminate\Support\Str::startsWith($candidate, ['http://', 'https://', 'data:'])
+                ? $candidate
+                : url(\Illuminate\Support\Facades\Storage::url($candidate));
+            break;
+        }
+    }
+    if (! $imageUrl) {
+        $defaultImage = \App\Models\Setting::get('default_og_image') ?: \App\Models\Setting::get('site_logo');
+        if ($defaultImage) {
+            $imageUrl = \Illuminate\Support\Str::startsWith($defaultImage, ['http://', 'https://', 'data:'])
+                ? $defaultImage
+                : url(\Illuminate\Support\Facades\Storage::url($defaultImage));
+        }
+    }
 @endphp
+@if($imageUrl)
+    @section('og_image', $imageUrl)
+@endif
 @section('structured_data')
-@if($article->published_at && $imageUrl)
+@if($article->published_at)
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org",

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'প্রোফাইল সম্পাদনা — ' . config('app.name'))
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-6">

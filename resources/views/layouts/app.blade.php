@@ -12,20 +12,38 @@
     <title>@yield('title', config('app.name'))</title>
     <link rel="icon" type="image/x-icon" href="{{ \App\Models\Setting::get('site_favicon') ? Storage::url(\App\Models\Setting::get('site_favicon')) : asset('favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ \App\Models\Setting::get('site_favicon') ? Storage::url(\App\Models\Setting::get('site_favicon')) : asset('favicon.ico') }}">
-    @hasSection('meta_description')
-    <meta name="description" content="@yield('meta_description')">
+    @hasSection('robots')
+    <meta name="robots" content="@yield('robots')">
     @endif
-    @hasSection('canonical')
-    <link rel="canonical" href="@yield('canonical')">
-    @endif
+    <meta name="description" content="@yield('meta_description', \App\Models\Setting::get('site_tagline', ''))">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+    @php
+        $__ogImage = trim($__env->yieldContent('og_image'));
+        if (! $__ogImage) {
+            $__default = \App\Models\Setting::get('default_og_image') ?: \App\Models\Setting::get('site_logo');
+            if ($__default) {
+                $__ogImage = \Illuminate\Support\Str::startsWith($__default, ['http://', 'https://', 'data:'])
+                    ? $__default
+                    : url(\Illuminate\Support\Facades\Storage::url($__default));
+            }
+        }
+    @endphp
     <meta property="og:title" content="@yield('title', config('app.name'))">
     <meta property="og:description" content="@yield('meta_description', \App\Models\Setting::get('site_tagline', ''))">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta property="og:site_name" content="{{ config('app.name') }}">
-    @hasSection('og_image')
-    <meta property="og:image" content="@yield('og_image')">
+    <meta property="og:locale" content="bn_BD">
+    @if($__ogImage)
+    <meta property="og:image" content="{{ $__ogImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    @endif
+    <meta name="twitter:card" content="{{ $__ogImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="@yield('title', config('app.name'))">
+    <meta name="twitter:description" content="@yield('meta_description', \App\Models\Setting::get('site_tagline', ''))">
+    @if($__ogImage)
+    <meta name="twitter:image" content="{{ $__ogImage }}">
     @endif
     @hasSection('structured_data')
     @yield('structured_data')

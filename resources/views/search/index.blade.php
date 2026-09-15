@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'অনুসন্ধান: ' . request('q', '') . ' — ' . config('app.name'))
+@section('robots', 'noindex, follow')
 
 @section('content')
 <div class="max-w-[1240px] mx-auto px-4 py-6">

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'ড্যাশবোর্ড - ' . config('app.name'))
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 py-6">

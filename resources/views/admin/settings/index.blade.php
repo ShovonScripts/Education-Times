@@ -296,6 +296,17 @@
                     <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $settings['meta_keywords']->value ?? '') }}" class="admin-input w-full" placeholder="news, bangladesh, education, primary, ...">
                 </div>
                 <div>
+                    <label class="block text-xs font-medium text-[#666] mb-1">Default OG Image</label>
+                    <input type="file" name="default_og_image" accept="image/png,image/jpeg,image/webp" class="admin-input w-full file:bg-[#f5f5f5] file:border-0 file:px-3 file:py-1.5 file:text-sm file:mr-3">
+                    <p class="text-xs text-[#999] mt-1">Shown on social shares for articles without a featured image. Recommended size: 1200×630px</p>
+                    @if(!empty($settings['default_og_image']->value ?? ''))
+                    <div class="mt-2 flex items-center gap-3">
+                        <img src="{{ Storage::url($settings['default_og_image']->value ?? '') }}" class="h-16 w-auto border border-[#e0e0e0]" alt="Default OG image">
+                        <span class="text-xs text-[#999]">{{ $settings['default_og_image']->value ?? '' }}</span>
+                    </div>
+                    @endif
+                </div>
+                <div>
                     <label class="block text-xs font-medium text-[#666] mb-1">Google Analytics ID</label>
                     <input type="text" name="google_analytics_id" value="{{ old('google_analytics_id', $settings['google_analytics_id']->value ?? '') }}" class="admin-input w-full" placeholder="G-XXXXXXXXXX">
                 </div>

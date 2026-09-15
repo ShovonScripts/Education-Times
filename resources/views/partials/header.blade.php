@@ -161,9 +161,7 @@
 {{-- Sticky Category Nav (lives outside header so it sticks independently) --}}
 @if(isset($navCategories) && $navCategories->isNotEmpty())
 @php
-    $mdNavCats = $navCategories->take(3);
-    $lgOnlyCats = $navCategories->slice(3, 2);
-    $dropdownCats = $navCategories->slice(3);
+    $dropdownCats = $navCategories->slice(7);
 @endphp
 <nav id="stickyNav" class="bg-white border-b-2 border-[#111] z-40 sticky top-0 transition-shadow duration-200">
     <div class="max-w-[1240px] mx-auto px-4">
@@ -201,13 +199,13 @@
             </li>
             @foreach($navCategories as $cat)
                 @php $pos = $loop->index; @endphp
-                <li class="{{ $pos < 3 ? '' : ($pos < 5 ? 'hidden lg:flex items-stretch' : 'hidden') }}">
+                <li class="{{ $pos < 3 ? '' : ($pos < 7 ? 'hidden lg:flex items-stretch' : 'hidden') }}">
                     <a href="{{ route('article.category', $cat->slug) }}"
                        class="block px-3 py-3.5 text-sm font-semibold {{ request()->routeIs('article.category') && request()->route('slug') === $cat->slug ? 'text-white bg-[#111]' : 'text-[#111] hover:text-white hover:bg-[#111]' }} transition">
                         {{ $cat->name_bn }}
                     </a>
                 </li>
-                @if($pos == 4) @break @endif
+                @if($pos == 6) @break @endif
             @endforeach
             @if($dropdownCats->isEmpty())
             <li class="flex items-center">
