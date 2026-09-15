@@ -307,10 +307,13 @@
         startX = e.clientX;
         startTranslateX = currentX;
         track.style.cursor = 'grabbing';
-        track.setPointerCapture(e.pointerId);
+        // NOTE: deliberately NOT calling setPointerCapture here — pointer
+        // capture retargets the subsequent mouseup/click onto this div,
+        // which kills the anchor's default click navigation. The window
+        // listeners below give the same drag-anywhere behavior instead.
     });
 
-    track.addEventListener('pointermove', function(e) {
+    window.addEventListener('pointermove', function(e) {
         if (!isDragging) return;
         const dx = e.clientX - startX;
         if (Math.abs(dx) > 3) hasMoved = true;
@@ -326,9 +329,8 @@
         startTranslateX = currentX;
     }
 
-    track.addEventListener('pointerup', endDrag);
-    track.addEventListener('pointercancel', endDrag);
-    track.addEventListener('pointerleave', endDrag);
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
 
     track.addEventListener('mouseenter', function() {
         if (!isDragging) paused = true;

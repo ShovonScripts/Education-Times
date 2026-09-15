@@ -47,6 +47,7 @@ class SettingController extends Controller
             'site_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'site_footer_logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'site_loader' => 'nullable|image|mimes:gif,png|max:2048',
+            'site_favicon' => 'nullable|file|mimes:png,jpg,jpeg,ico,webp|max:2048',
             'loader_enabled' => 'nullable|in:0,1',
             'footer_text' => 'nullable|string|max:2000',
             'footer_copyright' => 'nullable|string|max:500',
