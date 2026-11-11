@@ -23,6 +23,11 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('DemoDataSeeder skipped in production (contains demo credentials).');
+            return;
+        }
+
         $this->seedAllUserTypes();
         $this->seedComments();
         $this->seedArticleTags();

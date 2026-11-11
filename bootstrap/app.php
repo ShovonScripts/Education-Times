@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\RedirectMiddleware;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\StaffMiddleware;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
@@ -21,13 +22,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'redirect' => RedirectMiddleware::class,
         ]);
 
-        $middleware->group('web', [
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        // Keep the framework's default "web" group intact (EncryptCookies,
+        // StartSession, ShareErrorsFromSession, ValidateCsrfToken,
+        // SubstituteBindings) and append only what this app needs.
+        $middleware->web(append: [
             \Illuminate\Session\Middleware\AuthenticateSession::class,
+            RedirectMiddleware::class,
         ]);
+
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, \Illuminate\Http\Request $request) {

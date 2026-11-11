@@ -54,7 +54,7 @@ class PageController extends Controller
             'content' => 'nullable|string',
         ]);
 
-        Setting::set('page_' . $slug, $request->input('content', ''));
+        Setting::set('page_' . $slug, clean($request->input('content', '')));
 
         return redirect()->route('admin.pages.index')
             ->with('success', 'Page content updated!');

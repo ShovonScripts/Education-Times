@@ -24,27 +24,12 @@ class AppServiceProvider extends ServiceProvider
         // Bengali relative times everywhere ("২ ঘণ্টা আগে") instead of English diffForHumans
         Carbon::setLocale('bn');
 
-        $sidebarData = Cache::remember('admin_sidebar_counts', 60, function () {
-            $statusCounts = Article::select('status', DB::raw('count(*) as c'))
-                ->groupBy('status')
-                ->pluck('c', 'status');
-
-            return [
-                'pendingCount' => $statusCounts['submitted'] ?? 0,
-                'scheduledCount' => $statusCounts['scheduled'] ?? 0,
-                'adminCount' => User::where('is_admin', true)->count(),
-                'unreadContactCount' => Schema::hasTable('contacts') ? Contact::unread()->count() : 0,
-                'subscriberCount' => Schema::hasTable('newsletter_subscribers') ? NewsletterSubscriber::active()->count() : 0,
-                'siteLogo' => Setting::get('site_logo', ''),
-                'siteNameBn' => Setting::get('site_name_bn', config('app.name')),
-            ];
+        View::composer('admin.partials.sidebar', function ($view) {
+            $view->with($this->sidebarData());
         });
 
-        View::composer('admin.partials.sidebar', function ($view) use ($sidebarData) {
-            $view->with($sidebarData);
-        });
-
-        View::composer('layouts.admin', function ($view) use ($sidebarData) {
+        View::composer('layouts.admin', function ($view) {
+            $sidebarData = $this->sidebarData();
             $view->with([
                 'siteLogo' => $sidebarData['siteLogo'],
                 'siteNameBn' => $sidebarData['siteNameBn'],
@@ -72,6 +57,44 @@ class AppServiceProvider extends ServiceProvider
             $view->with('socialLinkedin', Setting::get('social_linkedin', ''));
             $view->with('socialWhatsapp', Setting::get('social_whatsapp', ''));
             $view->with('siteFooterLogo', Setting::get('site_footer_logo', ''));
+        });
+    }
+
+    /**
+     * Admin sidebar counters. Computed lazily only when an admin view is
+     * rendered (never during boot/console/queue), and guarded so a fresh
+     * database without migrated tables cannot crash the application.
+     */
+    private function sidebarData(): array
+    {
+        return Cache::remember('admin_sidebar_counts', 60, function () {
+            $defaults = [
+                'pendingCount' => 0,
+                'scheduledCount' => 0,
+                'adminCount' => 0,
+                'unreadContactCount' => 0,
+                'subscriberCount' => 0,
+                'siteLogo' => '',
+                'siteNameBn' => config('app.name'),
+            ];
+
+            if (!Schema::hasTable('articles')) {
+                return $defaults;
+            }
+
+            $statusCounts = Article::select('status', DB::raw('count(*) as c'))
+                ->groupBy('status')
+                ->pluck('c', 'status');
+
+            return [
+                'pendingCount' => $statusCounts['submitted'] ?? 0,
+                'scheduledCount' => $statusCounts['scheduled'] ?? 0,
+                'adminCount' => Schema::hasTable('users') ? User::where('is_admin', true)->count() : 0,
+                'unreadContactCount' => Schema::hasTable('contacts') ? Contact::unread()->count() : 0,
+                'subscriberCount' => Schema::hasTable('newsletter_subscribers') ? NewsletterSubscriber::active()->count() : 0,
+                'siteLogo' => Schema::hasTable('settings') ? Setting::get('site_logo', '') : '',
+                'siteNameBn' => Schema::hasTable('settings') ? Setting::get('site_name_bn', config('app.name')) : config('app.name'),
+            ];
         });
     }
 }

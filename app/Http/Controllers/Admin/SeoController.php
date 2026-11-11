@@ -86,10 +86,10 @@ class SeoController extends Controller
         }
         if ($request->filled('seo_issue')) {
             match ($request->seo_issue) {
-                'no_meta_title' => $query->whereNull('meta_title')->orWhere('meta_title', ''),
-                'no_meta_desc' => $query->whereNull('meta_description')->orWhere('meta_description', ''),
-                'no_og_image' => $query->whereNull('og_image')->orWhere('og_image', ''),
-                'no_keywords' => $query->whereNull('focus_keywords')->orWhere('focus_keywords', ''),
+                'no_meta_title' => $query->where(fn ($q) => $q->whereNull('meta_title')->orWhere('meta_title', '')),
+                'no_meta_desc' => $query->where(fn ($q) => $q->whereNull('meta_description')->orWhere('meta_description', '')),
+                'no_og_image' => $query->where(fn ($q) => $q->whereNull('og_image')->orWhere('og_image', '')),
+                'no_keywords' => $query->where(fn ($q) => $q->whereNull('focus_keywords')->orWhere('focus_keywords', '')),
                 default => null,
             };
         }
@@ -219,6 +219,7 @@ class SeoController extends Controller
 
         $validated['old_url'] = '/' . ltrim($validated['old_url'], '/');
         Redirect::create($validated);
+        Cache::forget('active_redirects');
 
         return redirect()->route('admin.seo.redirects')->with('success', 'Redirect created!');
     }
@@ -244,12 +245,15 @@ class SeoController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $redirect->update($validated);
 
+        Cache::forget('active_redirects');
+
         return redirect()->route('admin.seo.redirects')->with('success', 'Redirect updated!');
     }
 
     public function redirectDestroy(Redirect $redirect): RedirectResponse
     {
         $redirect->delete();
+        Cache::forget('active_redirects');
         return redirect()->route('admin.seo.redirects')->with('success', 'Redirect deleted!');
     }
 
