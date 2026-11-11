@@ -17,7 +17,10 @@ class SecurityTest extends TestCase
             ->assertNotFound()
             ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
             ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+            ->assertHeader('Cross-Origin-Opener-Policy', 'same-origin')
+            ->assertHeader('X-Permitted-Cross-Domain-Policies', 'none')
+            ->assertHeader('Content-Security-Policy', "frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
     }
 
     public function test_guest_is_redirected_from_dashboard(): void
@@ -71,6 +74,22 @@ class SecurityTest extends TestCase
         $user = User::factory()->create([
             'password' => 'password',
             'is_admin' => false,
+        ]);
+
+        $this->from('/admin/login')->post('/admin/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect('/admin/login')->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+    }
+
+    public function test_inactive_admin_cannot_login_to_admin_area(): void
+    {
+        $user = User::factory()->create([
+            'password' => 'password',
+            'is_admin' => true,
+            'is_active' => false,
         ]);
 
         $this->from('/admin/login')->post('/admin/login', [

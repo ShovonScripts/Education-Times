@@ -65,6 +65,8 @@ class AuthController extends Controller
             $user = Auth::user();
             if ($user->is_active === false) {
                 Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
                 return back()->withErrors([
                     'email' => 'আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে।',
                 ])->onlyInput('email');

@@ -17,6 +17,9 @@ class SecurityHeaders
             'X-Frame-Options' => 'SAMEORIGIN',
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
             'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()',
+            'Cross-Origin-Opener-Policy' => 'same-origin',
+            'X-Permitted-Cross-Domain-Policies' => 'none',
+            'Content-Security-Policy' => "frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
         ];
 
         foreach ($headers as $name => $value) {

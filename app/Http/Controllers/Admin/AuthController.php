@@ -29,16 +29,13 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            if (!Auth::user()->is_admin) {
-                Auth::logout();
-                $request->session()->invalidate();
-                return back()->withErrors(['email' => 'This account does not have admin access.']);
-            }
+            $user = Auth::user();
 
-            if (Auth::user()->is_active === false) {
+            if (! $user->is_admin || ! $user->is_active) {
                 Auth::logout();
                 $request->session()->invalidate();
-                return back()->withErrors(['email' => 'Your account has been deactivated.']);
+                $request->session()->regenerateToken();
+                return back()->withErrors(['email' => 'These credentials do not match our records.'])->onlyInput('email');
             }
 
             $request->session()->regenerate();
